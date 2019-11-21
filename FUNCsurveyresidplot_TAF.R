@@ -28,7 +28,7 @@ plot.survey.residuals_TAF<-function(nox=1,noy=1,start.year=0,end.year=0,use.ref.
   my.species<-1
   
   aa<-subset(res,Species.n==1)
-  nf<-finfo[sp+1] 
+  nf<-ncol(fleet.names)
 
   
   sp.name<-"Area-1r"
@@ -61,7 +61,7 @@ plot.survey.residuals_TAF<-function(nox=1,noy=1,start.year=0,end.year=0,use.ref.
     ypos <- as.numeric(dimnames(tmp)[[1]]) #ages
     
     title<- paste(sp.name," fleet:",f,sep="")#"Area-1r fleet:1"
-    title<- fleet.names[sp,f]#"RTM 2007-2017"
+    title<- fleet.names[1,f]#"RTM 2007-2017"
     
     
     
