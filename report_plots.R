@@ -11,7 +11,6 @@
 
 library(icesTAF)
 library(ggplot2)
-library(lattice)
 source("utilities_sms.R")
 
 mkdir("report")
@@ -24,26 +23,7 @@ years=read.csv("./data/effort.csv")[,1]
 
 
 ## 1  Data
-
 taf.png("catage")
-par(mar=c(5, 4, 4, 6)+0.1,xpd=TRUE)
-
-catage <- read.taf("data/catage.csv")
-catage <- aggregate(cbind(`0`,`1`,`2`,`3`,`4+`)~Year, catage, sum)
-catage <- prop.table(as.matrix(taf2xtab(catage)), 1)
-barplot(t(rev(as.data.frame(catage))), ylim=0:1,
-        xlab="Year", ylab="Proportion at age",
-        col=c("violet","deepskyblue","seagreen","khaki4","lightcoral"))
-
-legend(legend = colnames(catage),
-       title = "Age",
-       fill = rev(c("violet","deepskyblue","seagreen","khaki4","lightcoral")),
-       x="right",inset=c(-0.15,0))
-
-box()
-dev.off()
-##################################
-taf.png("catage2")
 catage <-read.csv("data/catage.csv")
 catage <- aggregate(cbind(X0,X1,X2,X3,X4.)~Year,data = catage,sum)
 catprop<-as.data.frame(catage[,-1],row.names = catage$Year)
