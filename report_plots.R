@@ -11,7 +11,6 @@
 
 library(icesTAF)
 library(ggplot2)
-library(tidyr)
 library(lattice)
 source("utilities_sms.R")
 
@@ -54,13 +53,12 @@ Ages<-c("0","1","2","3","4+")
 catprop<-as.data.frame(cbind(rownames(catprop),catprop),row.names = 1:nrow(catprop))
 colnames(catprop)<-c("Year",Ages)
 
-catprop<-rev(catprop)
-catprop_long<-pivot_longer(catprop,cols = 1:5,names_to = "Age",values_to = "Fmort")
+catprop_long <- taf2long(catprop, names=c("Year","Age","Fmort"))
 
 
 GP<-ggplot(catprop_long, aes(x=Year, y=Fmort))+geom_col(aes(fill=Age),col="black",size=0.2 )+
   ylab("Proportion at age")+ylim(c(0,1.0000001))+
-  scale_x_discrete(name="Year", breaks=Yearlabs,labels = Yearlabs)+theme(text = element_text(size=35))
+  scale_x_continuous(name="Year", breaks=Yearlabs,labels = Yearlabs)+theme(text = element_text(size=35))
 
 print(GP)
 dev.off()
