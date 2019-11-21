@@ -59,6 +59,20 @@ fatage <- read.taf("output/fatage.csv")
 fatage <- sandeel.table(fatage, digits=3)
 write.taf(fatage, dir="report", quote=TRUE)  # commas in colnames
 
+## fatage_annual (xtab, trim col, col mean, round, aggregate to year, Fbar(1-2))
+#Working progress 
+#ALSO: A lot of logic i dont get in this table compared to haf step
+fatage_annual <- read.taf("output/fatage.csv")
+fatage_annual <- aggregate(cbind(`0`,`1`,`2`,`3`,`4+`)~Year,data = fatage_annual,sum)
+fatage_annual<-fatage_annual[,-2]
+fatage_annual["Age 4+"]<-NA #what to do with this?
+colnames(fatage_annual)<-c("Year", "Age 0","Age 1","Age 2","Age 3","Age 4+")
+fatage_annual["Avg. 1-2"]<-fatage_annual$`Age 0`
+fatage_annual <- rbind(fatage_annual, colMeans(fatage_annual))
+fatage_annual[nrow(fatage_annual),1] <- "arith. mean"
+fatage_annual <- rnd(fatage_annual, -1, 3)
+
+
 ## natage (realign step, add current, round)
 natage <- read.taf("output/natage.csv")
 natage$"0" <- c(natage$"0"[-1], NA)

@@ -35,7 +35,9 @@ step2long <- function(x, names=c("Year","Step","Age","Value"))
   y1 <- sub(":.*", "", y[[1]])
   y2 <- sub(".*:", "", y[[1]])
   z <- data.frame(y1, y2, y[-1])
-  z <- type.convert(z, as.is=TRUE)
+  z$y1<-as.numeric(as.character(z$y1)) # I have tried to mimic type.convert()
+  z$y2<-as.numeric(as.character(z$y2)) # I have tried to mimic type.convert()
+  #z <- type.convert(z, as.is=TRUE)
   names(z) <- names
   z <- z[order(z[[1]], z[[2]], z[[3]]),]
   row.names(z) <- NULL
@@ -103,3 +105,48 @@ zoom <- function(obj, cex=1.8, cex.main=1.3*cex, cex.lab=1.1*cex, cex.axis=cex,
   })
   print(obj)
 }
+
+###########################
+# RG
+
+read.fleet_TAF<-function()
+{
+  file<-file.path("./model",'fleet_names.in')
+  s<-readLines(file, n=1000)
+  s<-gsub('_',' ',s)
+  s<-sub('[[:space:]]+$', '', s)
+  
+  file<-file.path("./model",'fleet_info.dat')
+  finfo<-scan(file,skip=3,comment.char = "#",quiet =TRUE) 
+  years<-rep(0,2)
+  ages<-rep(0,3)
+  
+
+  nf<-finfo[1] #no. of fleets
+  fl=NA
+
+    for (f in (1:nf)) {
+      fl[f]<-s[f]
+  }
+  
+fl<-cbind(fl[1],fl[2]) #change format to make compatible with previous sandeel script (multispecies therefore multiple rows)
+
+}
+
+###############################
+Read.summary.data_TAF<-function(infile='summary.out')
+{
+  file<-file.path("./model/",infile)
+  s<-read.table(file,header=TRUE)
+}
+
+##################
+## Taken from the Sandeel utilities
+
+#Stripped down function for TAF
+
+source("FUNCcatchresidplot_TAF.R")
+
+###################
+#
+source("FUNCsurveyresidplot_TAF.R")
