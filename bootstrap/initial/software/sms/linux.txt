@@ -1,0 +1,10 @@
+Three lines of code need to be changed to build the Linux executable:
+
+Comment out these lines:
+ !! _strdate(dateStr);
+ !! _strtime(f_timeStr);
+
+Change this
+  report<<"Date: "<<dateStr<<"  Start time:"<<f_timeStr
+to that:
+  report<<"Date: "<<__DATE__<<"  Start time:"<<__TIME__
