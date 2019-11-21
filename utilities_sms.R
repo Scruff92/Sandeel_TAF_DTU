@@ -121,16 +121,16 @@ read.fleet_TAF<-function()
   years<-rep(0,2)
   ages<-rep(0,3)
   
-
+  
   nf<-finfo[1] #no. of fleets
   fl=NA
-
-    for (f in (1:nf)) {
-      fl[f]<-s[f]
+  
+  for (f in (1:nf)) {
+    fl[f]<-s[f]
   }
   
-fl<-cbind(fl[1],fl[2]) #change format to make compatible with previous sandeel script (multispecies therefore multiple rows)
-
+  fl<-cbind(fl[1],fl[2]) #change format to make compatible with previous sandeel script (multispecies therefore multiple rows)
+  
 }
 
 ###############################
@@ -138,6 +138,15 @@ Read.summary.data_TAF<-function(infile='summary.out')
 {
   file<-file.path("./model/",infile)
   s<-read.table(file,header=TRUE)
+}
+##################################
+Read.reference.points_TAF<-function(){
+  
+  a<-scan(file.path("./model","reference_points.in"),comment.char = "#",quiet = TRUE)
+  b<-matrix(a,nrow=1,ncol=4,byrow=TRUE)
+  colnames(b)<-c("Flim","Fpa","Blim","Bpa")   
+  rownames(b)<-"Area 1-r"
+  b
 }
 
 ##################

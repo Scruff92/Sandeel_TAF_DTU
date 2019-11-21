@@ -194,4 +194,104 @@ plot.catch.residuals_TAF()
 plot.survey.residuals_TAF(nox=1,noy=1,start.year=2000,end.year=2020,over.all.max=1)
 
 
+########################
+# Multi Summary (SAG-like)
 
+
+include.terminal.year <- T          # plot terminal year (last assessment year +1) as well?
+include.last.assess.year.recruit <- T          # plot recruits terminal year as well?
+
+first.year<- -1975                #first year on plot, negative value means value defined by data
+last.year<- 2060               #last year on plot
+incl.M2.plot<-F
+incl.reference.points<-T
+
+OperatingModel<-F
+redefine.scenario.manually<-T
+
+palette("default")
+
+
+nox<-2; noy<-2;
+noxy<-nox*noy
+
+ref<-Read.reference.points_TAF()
+#ref<-Read.reference.points()
+
+#dat<-Read.summary.data(extend=include.terminal.year,read.init.function=F)
+dat<-Read.summary.data_TAF()
+
+
+dat<-subset(dat,Year<=last.year )
+
+if (first.year>0) dat<-subset(dat,Year>=first.year )
+
+sp=1
+sp.name<-"Area-1r"
+discard<-FALSE
+taf.png("Summary", width = 1600, height = 1200,units = "px", pointsize = 30, bg = "white")
+par(mfrow=c(2,2))
+par(mar=c(3,4,3,2))
+
+s<-subset(dat,Species.n==1)
+
+#av.F.age<-SMS.control@avg.F.ages[sp-first.VPA+1,]
+txt<-readLines("~/Documents/ICES/Sandeel_TAF_DTU/model/sms.dat")
+txt<-readLines(file.path("./model","sms.dat"))
+av.F.age<-txt[grep(pattern = "option avg.F.ages", x = txt,fixed = F)+1]
+av.F.age<-as.numeric(unlist(strsplit(av.F.age," "))[c(1,2)])
+names(av.F.age)<-c("first-age","last-age")
+
+s1<-subset(s,s$Age>=av.F.age[1] & s$Age<=av.F.age[2])
+FI<-tapply(s1$F,list(s1$Year),sum)/(av.F.age[2]-av.F.age[1]+1)
+s1<-subset(s,weca>=0 )
+
+Yield<-tapply(s1$Yield,list(s1$Year),sum)/1000
+SOP<-tapply(s1$CWsum,list(s1$Year),sum)/1000
+catch<-Yield
+s1<-subset(s,Quarter==1)
+ssb<-tapply(s1$SSB,list(s1$Year),sum)/1000
+
+
+#s2<-subset(s,Age==fa & Quarter==SMS.control@rec.season)
+#Quarter=2 and fa=0 #
+## !!!!!!!!!!!!!!!!!!!
+fa=0
+s2<-subset(s,Age==fa & Quarter==2)
+
+
+ref
+
+rec<-tapply(s2$N,list(s2$Year),sum)/1000000
+year<-as.numeric(unlist(dimnames(ssb)))
+year.ssb<-year
+
+if(include.terminal.year){
+  #Truncate the final year from key parameters
+  year<- year[-length(year)]        
+  FI <- FI[-length(FI)]
+} 
+if(!include.last.assess.year.recruit) rec <- rec[-length(rec)]
+
+barplot(catch,space=1,xlab='',ylab='1000 tonnes',main=paste(sp.name,ifelse(discard,',  Yield and discard',',  Catch'),sep=''),ylim=c(0,max(SOP)))
+
+#plot recruits
+barplot(rec,space=1,xlab='',ylab='billions',main=paste('Recruitment age',fa),ylim=c(0,max(rec)))
+F.max<-max(FI,ref[sp,"Flim"])
+
+plot(year,FI,type='b',lwd=3,xlab='',ylab='',main="Fishing mortality",ylim=c(0,F.max))
+
+if (incl.reference.points) if (ref[sp,"Flim"]>0) abline(h=ref[sp,"Flim"],lty=2,lwd=2)
+if (incl.reference.points) if (ref[sp,"Fpa"]>0) abline(h=ref[sp,"Fpa"],lty=3,lwd=2)
+grid()
+
+Blim<-ref[sp,"Blim"]/1000; Bpa<-ref[sp,"Bpa"]/1000
+SSB.max<-max(ssb,Bpa)
+plot(year.ssb,ssb,type='b',lwd=3,xlab='',ylab='1000 tonnes',main='SSB',ylim=c(0,SSB.max))
+if (incl.reference.points) if (Blim>0) abline(h=Blim,lty=2,lwd=2)
+if (incl.reference.points) if (Bpa>0) abline(h=Bpa,lty=3,lwd=2)
+grid()
+
+dev.off()
+
+#######################################################
