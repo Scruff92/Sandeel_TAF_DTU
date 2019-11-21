@@ -295,3 +295,27 @@ grid()
 dev.off()
 
 #######################################################
+#Dredge survey index timeline (scaled)
+taf.png("survey_index_scaled")
+
+dat1=read.csv(file.path("data","survey.csv"))
+dat11=taf2long(dat1)
+
+#it is scaling for both ages seperately!
+dat11$scaled=NA
+dat11$scaled[dat11$Age=="X0"]<-scale(dat11$Value[dat11$Age=="X0"])
+dat11$scaled[dat11$Age=="X1"]<-scale(dat11$Value[dat11$Age=="X1"])
+dat11$age<-factor(dat11$Age,labels=c("0","1"))
+dat<-dat11
+#format like previous program
+
+miny =min(dat["Year"])
+maxy =max(dat["Year"])
+if(maxy-miny<10) by=2 else by=4
+
+GP<-ggplot(dat, aes(x=Year, y=scaled, color=age))+geom_line()+theme_bw()+ylab("survey index (scaled)")+
+  scale_x_continuous(breaks=seq(miny, maxy, by=by))
+GP<-GP+theme(text = element_text(size=40))
+print(GP)
+dev.off()
+########################################
