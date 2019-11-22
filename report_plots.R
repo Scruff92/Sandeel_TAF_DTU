@@ -319,3 +319,7 @@ GP<-GP+theme(text = element_text(size=40))
 print(GP)
 dev.off()
 ########################################
+
+#SSB _ R relationship
+
+source("SSB_R_plot.R")

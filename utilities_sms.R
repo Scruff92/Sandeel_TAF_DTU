@@ -134,11 +134,30 @@ read.fleet_TAF<-function()
 }
 
 ###############################
-Read.summary.data_TAF<-function(infile='summary.out')
+Read.summary.data_TAF<-function(infile='summary.out',extend=T)#maybe remove extend
 {
   file<-file.path("./model/",infile)
   s<-read.table(file,header=TRUE)
+  if (!extend) s<-subset(s,Z>-1)
+  data.frame(Species="Area-1r",s)
 }
+############################
+read.sms.dat_TAF <- function(label="eg.first.year/last.year.model",printlabel=F)
+{
+  label=paste0("option ",label,")")
+  txt <- readLines("model/sms.dat")
+  beg <- grep(label,txt,fixed = F) + 1
+  if(length(beg)>0){
+    end <- c(grep("####",txt,fixed=F), length(txt))
+    end <- end[end>beg][1] -1
+    title<-txt[beg-1]
+    txt <- txt[beg:end]
+    if(printlabel){     print(paste0(title," = ",txt))}
+    return(as.numeric(txt))
+  }else{warning("Label not found. Look in sms.dat file for appropriate label names (preceeded by option).
+            Alternatively, try reversing the order of the label (ie. year.first becomes first.year)")}
+}
+
 ##################################
 Read.reference.points_TAF<-function(){
   
@@ -148,6 +167,13 @@ Read.reference.points_TAF<-function(){
   rownames(b)<-"Area 1-r"
   b
 }
+############
+#Function to read parameters for SSB recruit relation model
+Read.SSB.Rec.data_TAF<-function()
+{
+  file<-file.path("./model",'ssb_r.out')
+  s<-read.table(file,header=TRUE)
+  data.frame(Species="Area-1r",s)}
 
 ##################
 ## Taken from the Sandeel utilities
@@ -159,3 +185,4 @@ source("FUNCcatchresidplot_TAF.R")
 ###################
 #
 source("FUNCsurveyresidplot_TAF.R")
+
