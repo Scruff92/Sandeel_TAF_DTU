@@ -43,7 +43,6 @@ GP<-ggplot(catprop_long, aes(x=Year, y=Fmort))+geom_col(aes(fill=Age),col="black
 print(GP)
 dev.off()
 ################################
-
 taf.png("wcatch",width = 663,height = 435)
 wcatch <- read.taf("data/wcatch.csv")
 wcatch <- step2long(wcatch)
@@ -323,3 +322,8 @@ dev.off()
 #SSB _ R relationship
 
 source("SSB_R_plot.R")
+
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+msg("report_plots.R done")
