@@ -134,7 +134,9 @@ read.fleet_TAF<-function()
 }
 
 ###############################
+#note my default is extend=TRUE
 Read.summary.data_TAF<-function(infile='summary.out',extend=T)#maybe remove extend
+  
 {
   file<-file.path("./model/",infile)
   s<-read.table(file,header=TRUE)
@@ -153,8 +155,10 @@ read.sms.dat_TAF <- function(label="eg.first.year/last.year.model",printlabel=F)
     title<-txt[beg-1]
     txt <- txt[beg:end]
     if(printlabel){     print(paste0(title," = ",txt))}
-    return(as.numeric(txt))
-  }else{warning("Label not found. Look in sms.dat file for appropriate label names (preceeded by option).
+    
+    if(grepl(pattern = "[A-Za-z]",txt)){return(txt)}else{ return(as.numeric(txt))}
+  }else{
+    warning("Label not found. Look in sms.dat file for appropriate label names (preceeded by option).
             Alternatively, try reversing the order of the label (ie. year.first becomes first.year)")}
 }
 
