@@ -179,6 +179,19 @@ Read.SSB.Rec.data_TAF<-function()
   s<-read.table(file,header=TRUE)
   data.frame(Species="Area-1r",s)}
 
+
+##################
+Read.SMS.std_TAF<-function() {
+a<-read.table(file=file.path("./model","sms.std"),skip=1) 
+tmp<-data.frame(index=a$V1,name=a$V2, value=a$V3, CV.round=round(a$V4/a$V3*100), std=a$V4)
+
+b<-read.table(file.path("./model","par_exp.out"),comment.char = "#",header=T) 
+tmp<-merge(tmp,b,by.x="index",by.y="parNo",all.x=T)
+tmp<-subset(tmp,select=-par)
+tmp<-subset(tmp,select=c(-prey,-predator))
+
+return(tmp)
+}
 ##################
 ## Taken from the Sandeel utilities
 

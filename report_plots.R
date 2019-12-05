@@ -323,5 +323,94 @@ dev.off()
 
 source("SSB_R_plot.R")
 
+######################
+taf.png("Model_Output.png")
+
+Arith_log <- c("Arithmetric","Log values")[1]  #select assumed distribution of variables
+include.last.assessment.year.recruit<-T       # should be T when the dregde survey data are availeble
+include.TAC.year.SSB<-T                      # should the SSB plot include the SSB for the fisrt year after the assessment year (default TRUE)
+
+confidence<- 0.90  # 90% confidence limits
+
+two<-qt(1-(1-confidence)/2, df = 10000)  # plus minus factor to get confidence interval
+
+plot.CV<-function(var.name='hist_SSB') {
+  
+  ref<-Read.reference.points_TAF()
+  
+  tmp<-Read.SMS.std_TAF()
+  
+  tmp$name[tmp$name=="next_SSB"]<-'hist_SSB'
+  
+  a<-subset(tmp,name==var.name & species>0 ,drop=TRUE)
+  a$Species<-"Area-1r"
+  
+  if (var.name %in% c('hist_SSB','hist_log_SSB'))  ytitl<-"SSB (1000 t)"  else if (var.name %in% c('avg_sumF','avg_log_sumF')) ytitl<-"Average F"  else if (var.name %in% c('rec_sd','log_recsd')) ytitl<-"Recruitment (10^6)" else if (var.name=='M2_sd0' | var.name=='M2_sd1') ytitl<-"M2"  else stop("name must be hist_SSB or avg_F")
+  
+  if (var.name=='rec_sd') {
+    a$value<-a$value/1000
+    a$std<-a$std/1000
+    if (include.last.assessment.year.recruit==F) {
+      a<-subset(a,year!=read.sms.dat_TAF("last.year.model"))
+    } 
+  }
+  
+  if (var.name=='log_recsd') {
+    a$value<- a$value-log(1000)
+    if (include.last.assessment.year.recruit==F) {
+      a<-subset(a,year!=read.sms.dat_TAF("last.year.model"))
+    } 
+  }
+  
+  if (var.name=='hist_SSB') {
+    a$value<-a$value/1000
+    a$std<-a$std/1000
+    if (!include.TAC.year.SSB) {
+      maxy<-max(a$year)
+      a<-subset(a,year<=maxy)
+    }
+  }
+  
+  if (var.name=='hist_log_SSB') {
+    a$value<-a$value-log(1000)
+    if (!include.TAC.year.SSB) {
+      maxy<-max(a$year)
+      a<-subset(a,year<=maxy)
+    }
+  }
+ 
+  #lets assume arithmetric
+  x=a
+  minval<-min(x$value-2*x$std*2,0)  # plotting y-axis range
+  maxval<-max(x$value+1.25*x$std*2) # plotting y-axis range
+  plot( x$year,x$value,xlab='',ylab=ytitl,ylim=c(minval,maxval),type='b',xlim=c(1980,2020))
+  lines(x$year,x$value-two*x$std,lty=2)
+  lines(x$year,x$value+two*x$std,lty=2)
+  
+  sp<-1
+  
+  if (var.name %in% c('avg_sumF','avg_log_sumF')) {
+    if (ref[sp,"Flim"]>0) abline(h=ref[sp,"Flim"],lty=2,lwd=2)
+    if (ref[sp,"Fpa"]>0) abline(h=ref[sp,"Fpa"],lty=3,lwd=2)
+  }
+  if (var.name %in% c('hist_SSB','hist_log_SSB')) {
+    Blim<-ref[sp,"Blim"]/1000; Bpa<-ref[sp,"Bpa"]/1000
+    if (Blim>0) abline(h=Blim,lty=2,lwd=2)
+    if (Bpa>0) abline(h=Bpa,lty=3,lwd=2)
+  }
+}  
+
+par(mfrow=c(3,1))
+par(mar=c(3,5,1,2))  
+plot.CV(var.name='avg_sumF') 
+plot.CV(var.name='hist_SSB')  
+plot.CV(var.name='rec_sd') 
+
+dev.off()
+
+############################################
+
+
+
 
 
