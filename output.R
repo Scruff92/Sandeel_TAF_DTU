@@ -1,7 +1,8 @@
 ## Extract results of interest, write TAF output tables
 
 ## Before: natmort.csv (data), details.out, sms.rep, summary_table.out (model)
-## After:  fatage.csv, natage.csv, summary.csv, transcript.txt (output)
+## After:  fatage.csv, natage.csv, summary.csv, transcript.txt 
+##         forecast_input.csv forecast_basis.csv, forecast_output.csv (output)
 
 library(icesTAF)
 source("utilities_sms.R")
@@ -49,3 +50,7 @@ write.taf(natage)
 write.taf(summary)
 writeLines(transcript, "transcript.txt")
 setwd("..")
+
+#Forecast input, basis and output
+source("Forecast.R")
+

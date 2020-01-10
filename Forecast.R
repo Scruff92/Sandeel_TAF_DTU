@@ -1,14 +1,15 @@
-#imput and output of Forecast
+#input and output of Forecast
 
 ########################
 # Input to forecast
 
 #defining if we use long term og 10 year average rec: 
-AA <- 34 #area 1r #this means using a long-term geom
+AA <- 34 #area 1r #this means using a long-term geom 
 
 RANGE = 100 #top end of the Fmult range, which the optimize function should explore when calculating Fmsy
 
-TAC.year<-2019
+TAC.year<-read.sms.dat_TAF(label = "last.year")+1
+
 
 #use this for area 1r
 scale.options<-c(0,1,1.1,1.2,1.3,1.4,1.5,1.6,1.7)*1
@@ -17,7 +18,8 @@ roundTAC<-3   # number of decimals in TAC
 
 recruimentMultipliers <-seq(0,1.0,0.2)   
 
-Recruit.in.Assess.year<- 0     #  >0 = Overwrite estimate from assessment with the given input value. Value must be given as recruitment (i.e 0-group in the assessment year) 
+Recruit.in.Assess.year<- 0     
+#  >0 = Overwrite estimate from assessment with the given input value. Value must be given as recruitment (i.e 0-group in the assessment year) 
 #   0 = Use value estimated from assessment (default)
 #  -1 = make forcast from based on values of 1-group in the TAC year (for Real time monitoring purposes) 
 
@@ -82,22 +84,14 @@ dimnames(outTab)[2]<-list(c(paste('Stock numbers(',TAC.year,')',sep=''),'Exploit
 
 
 write.csv(t(outTab),file=file.path("./output",'forecast_input.csv'))
-o<-t(outTab)
-oo<-matrix('aa',ncol=ncol(o),nrow=nrow(o),dimnames=dimnames(o))
-oo[1,]<-as.character(round(o[1,],3))
-oo[2:3,]<-as.character(formatC(o[2:3,],digits=3,flag='0',format='f'))
-oo[4:10,]<-as.character(formatC(o[4:10,],digits=3,flag='0',format='f'))
-write.csv(oo,file=file.path("./report","forecast_input.csv"),row.names = T)
-
+########################################################
 
 ##############################################################
-#source("./report_tables.R")
 
 outTab<-read.taf(file = file.path("./output","forecast_input.csv"))
 
 f.age<-1   # f.age is always 1
-#l.age<-read.sms.dat_TAF("max.age.all")+1  #5
-l.age<-4+1  #5 (Cant make this retrieve without new function)
+l.age<-as.numeric(sub("Age ",replacement = "",x = tail(colnames(outTab),1))) + 1 
 plus.group<-1   #1=yes, 0=no
 
 f.season<-1
@@ -118,7 +112,6 @@ M[is.na(M)]<-0
 Bmsy_Bpa<-Read.reference.points_TAF()[1,'Bpa']
 Bmsy_Blim<-Read.reference.points_TAF()[1,'Blim']
 
-sink(file.path("./output","forecast_output.csv"))
 
 ####################### Functions #############################
 
@@ -196,24 +189,44 @@ if (FALSE) {  # added by MV: to get a consistent (with output from the other tab
 } 
 avg.F.ages<-read.sms.dat_TAF("avg.F.ages")
 avg.F.ages<-as.numeric(unlist(strsplit(avg.F.ages,""))[c(1,3)])
-
-
-#0.632
 mean.f<-sum(FF[(avg.F.ages[1]+1):(avg.F.ages[2]+1),]) /(avg.F.ages[2]-avg.F.ages[1]+1)
-cat(paste("Area-1r","Sandeel\n"))
-cat(paste("\nBasis: Fsq=F(",TAC.year-1,")=",round(mean.f,4),";  Yield(",TAC.year-1,")=",round(Yield.assess,3),sep=''))
-#Basis: Fsq=F(2018)=0.6328;  Yield(2018)=130.461
 
-if (Recruit.in.Assess.year>0) cat(paste("; Recruitment(",TAC.year-1,")=",formatC(Recruit.in.Assess.year/1000000,format='f',digits=6),sep=''))
-if (Recruit.in.Assess.year==0) cat(paste("; Recruitment(",TAC.year-1,")=",formatC(No.recruits.in.assessment.year/1000000,format='f',digits=6),sep=''))
-#; Recruitment(2018)=110.803000
-if (Recruit.in.Assess.year==-1)  cat(paste("; Recruitment(",TAC.year-1,")= input",sep=''))
+#
+BASIS=data.frame("Basis Reference" = NA,
+                 "Basis Value" = NA)
 
-cat(paste("; Recruitment(",TAC.year,")=geometric mean (GM ",rec.string,")=", formatC(recruit.TAC.year/1000000,format='f',digits=6)," billions;",sep=''))
-#; Recruitment(2019)=geometric mean (GM 1983-2017)=107.870298 billions;
+BASIS[1,1] <- paste0("Fsq=F(",TAC.year-1,")")
+BASIS[1,2] <- round(mean.f,4)
 
-if (Recruit.in.Assess.year>=0) cat(paste("SSB(",TAC.year,")=",round(SSB0,3),"\n\n",sep='')) else cat('\n\n')
-#SSB(2019)=97.593
+BASIS[2,1] <- paste0("Yield(",TAC.year-1,")")
+BASIS[2,2] <- round(Yield.assess,3)
+
+if (Recruit.in.Assess.year>0){ 
+  BASIS[3,1] <- paste0("Recruitment(",TAC.year-1,")")
+  BASIS[3,2] <- formatC(Recruit.in.Assess.year/1000000,format='f',digits=6)}
+
+if (Recruit.in.Assess.year==0) {
+  BASIS[3,1] <- paste0("Recruitment(",TAC.year-1,")")
+  BASIS[3,2] <- formatC(No.recruits.in.assessment.year/1000000,format='f',digits=6)}
+
+if (Recruit.in.Assess.year==-1){ 
+  BASIS[3,1] <- paste0("Recruitment(",TAC.year-1,")")
+  BASIS[3,2] <- "input"  }
+
+
+BASIS[4,1] <- paste0("Recruitment(",TAC.year,")=Geom Mean ",rec.string)
+BASIS[4,2] <- paste0(formatC(recruit.TAC.year/1000000,format='f',digits=6))
+
+if (Recruit.in.Assess.year>=0) {
+  BASIS[5,1] <- paste0("SSB(",TAC.year,")")
+  BASIS[5,2] <- round(SSB0,3)
+}
+
+write.taf(BASIS,file = "output/forecast_basis.csv")
+
+#####
+
+sink(file.path("./output","forecast_output.csv"))
 
 
 if (Recruit.in.Assess.year>=0) {
@@ -243,8 +256,9 @@ if (Recruit.in.Assess.year>=0) {
     SSB1<-do.prediction(fmult,RTM=Recruit.in.Assess.year,F.default=FF)/1000  
     cat(paste(round(fmult,3),',',"MSY (Blim)",',',round(mean.f*fmult,3),',',round(TAC,roundTAC),',',  round(SSB1,3),',', round((SSB1-SSB0)/SSB0*100),'%,', round((TAC-Yield.assess)/Yield.assess*100),'%','\n'))
   } else cat('No conversion for calculation of MSY catch')
-
+  
 }
 
 
 sink()
+

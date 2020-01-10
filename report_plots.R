@@ -235,7 +235,6 @@ par(mar=c(3,4,3,2))
 s<-subset(dat,Species.n==1)
 
 #av.F.age<-SMS.control@avg.F.ages[sp-first.VPA+1,]
-txt<-readLines("~/Documents/ICES/Sandeel_TAF_DTU/model/sms.dat")
 txt<-readLines(file.path("./model","sms.dat"))
 av.F.age<-txt[grep(pattern = "option avg.F.ages", x = txt,fixed = F)+1]
 av.F.age<-as.numeric(unlist(strsplit(av.F.age," "))[c(1,2)])

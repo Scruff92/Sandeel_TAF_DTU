@@ -3,7 +3,8 @@
 ## Before: catage.csv, effort.csv, maturity.csv, natmort.csv, survey.csv,
 ##         wcatch.csv (data), fatage.csv, natage.csv, summary.csv (output)
 ## After:  catage.csv, effort.csv, fatage.csv, maturity.csv, natage.csv,
-##         natmort.csv, summary.csv, survey.csv, wcatch.csv (report)
+##         natmort.csv, summary.csv, survey.csv, wcatch.csv  forecast_input.csv (report)
+##        
 
 library(icesTAF)
 source("utilities_sms.R")
@@ -129,5 +130,11 @@ writeLines(transcript, "report/transcript.txt")
 
 
 ###################################################
-## forecast
-source("Forecast.R")
+## forecast input
+
+o <- read.taf("output/forecast_input.csv")
+oo<-cbind(o[,1],round(o[,-1],3))
+colnames(oo)[1]<-"Variable"
+
+write.taf(oo,dir="report",file="forecast_input.csv")
+
