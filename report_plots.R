@@ -15,14 +15,12 @@ source("utilities_sms.R")
 
 mkdir("report")
 
-# The years to be included on X-axis of figures (5 years between each)
-Yearlabs=c(1983,1988,1993,1998,2003,2008,2013,2018)
+
 
 #For use later in the script
-years=read.csv("./data/effort.csv")[,1] 
+years <- read.sms.dat_TAF("first.year"):read.sms.dat_TAF("last.year")
 
-
-## 1  Data
+###############################
 taf.png("catage")
 catage <-read.csv("data/catage.csv")
 catage <- aggregate(cbind(X0,X1,X2,X3,X4.)~Year,data = catage,sum)
@@ -35,53 +33,72 @@ colnames(catprop)<-c("Year",Ages)
 
 catprop_long <- taf2long(catprop, names=c("Year","Age","Fmort"))
 
+# The years to be included on X-axis of figure (5 years between each)
+Yearlabs=c(1983,1988,1993,1998,2003,2008,2013,2018)
 
 GP<-ggplot(catprop_long, aes(x=Year, y=Fmort))+geom_col(aes(fill=Age),col="black",size=0.2 )+
   ylab("Proportion at age")+ylim(c(0,1.0000001))+
-  scale_x_continuous(name="Year", breaks=Yearlabs,labels = Yearlabs)+theme(text = element_text(size=35))
-
+  scale_x_continuous(name="Year", breaks=Yearlabs,labels = Yearlabs)+theme(text = element_text(size=35))+
+  theme(legend.title = element_text(size=40),legend.text = element_text(size=40),
+        legend.key.size = unit(3,"line"))
+  
 print(GP)
 dev.off()
 ################################
-taf.png("wcatch",width = 663,height = 435)
+taf.png("wcatch")
+
+par(mar=c(5,7,5,7)+0.1,mgp=c(5,2,0))
 wcatch <- read.taf("data/wcatch.csv")
 wcatch <- step2long(wcatch)
 wcatch$Label <- factor(wcatch$Step,
                        labels=c("First half year", "Second half year"))
 
 
-GP<- ggplot(wcatch[!wcatch$Age=="0" | !wcatch$Step==1,],aes(x = Year,y=Value,col=Age))+
-   geom_line()+geom_point(cex=0.3,pch=3)+ylab("Mean Weight (g)")+
+GP <- ggplot(wcatch[!wcatch$Age=="0" | !wcatch$Step==1,],aes(x = Year,y=Value,col=Age))+
+   geom_line(size=2)+geom_point(cex=0.3,pch=3)+
    facet_wrap(~Label,nrow = 2)+scale_colour_manual(values = palette()[1:5])+theme_bw()+
    theme(panel.grid = element_blank(),panel.background = element_rect(fill="white"),legend.key= element_rect(fill = "white"))+
-   theme(strip.background = element_rect("steelblue"),text = element_text(size=18))+
-   scale_x_continuous(name="Year", breaks=Yearlabs,labels = Yearlabs)
+   theme(strip.background = element_rect("steelblue"),text = element_text(size=35))+
+   scale_x_continuous(name="Year", breaks=Yearlabs,labels = Yearlabs)+ylab("Mean Weight (g)")+
+   theme(legend.key.size = unit(3,"line"))
+
 print(GP)
+
 dev.off()
 
 ###################################
 
 taf.png("all_effort")
-par(mar=c(5, 4, 4, 5)+0.1,xpd=TRUE)
+
+par(mar=c(8, 10, 6, 5)+0.1,
+    mgp=c(5,2,0))
 
 effort<-read.csv("./data/effort.csv",header=T)
 Seff<-effort$Total
 eff<-as.matrix(effort[,2:3])
 
+tit="All Effort"
+
 plot(x=effort$Year,y=effort$Total,type="b",ylab='Standardised effort', xlab="Year",
-     col=1,lty=1,lwd=3,pch=1,ylim=c(0,max(effort$Total)),main="Sandeel Area 1-R")
-lines(effort$Year,effort[,2],type='b',col=2,lty=2,lwd=2, pch=2)
-lines(effort$Year,effort[,3],type='b',col=3,lty=3,lwd=2, pch=3)
+     col=1,lty=1,lwd=3,pch=1,cex=2,ylim=c(0,max(effort$Total)),
+     main=tit,
+     cex.main=5,cex.lab=3,cex.axis=3)
+
+lines(effort$Year,effort[,2],type='b',col=2,lty=2,lwd=2, pch=2,cex=2)
+lines(effort$Year,effort[,3],type='b',col=3,lty=3,lwd=2, pch=3,cex=2)
+
 legend("topright",
        c('Total effort','effort 1st half','effort 2nd half'),
-       pch=c(1,2,3),lty=c(1,2,3),lwd=c(3,2,2),col=c(1,2,3))
+       pch=c(1,2,3),lty=c(1,2,3),lwd=c(3,2,2),col=c(1,2,3),cex = 3)
 
 dev.off()
 
-## 2 Output
+###################################
 
 taf.png("cpue_effort")
-par(mar=c(5, 4, 4, 5)+0.1,xpd=TRUE)
+
+par(mar=c(8, 10, 6, 8)+0.1,
+    mgp=c(5,2,0))
 
 a<-Read.summary.data_TAF()
 Yield<-tapply(a$Yield,list(a$Year),sum)
@@ -92,23 +109,32 @@ cpue[Seff<10]<-NA
 
 tit<-'Catch per Standardised day fishing'
 
-plot(as.numeric(names(cpue)),cpue,type='b',ylab='CPUE (tonnes per standardised day fishing)',xlab=' ',col=1,lty=1,lwd=3,pch=1,ylim=c(0,max(cpue, na.rm=T)),main=tit)
+plot(as.numeric(names(cpue)),cpue,type='b',ylab='CPUE (tonnes per standardised day fishing)',xlab='Year',
+     col=1, lty=1, lwd=3, pch=1, cex=2, ylim=c(0,max(cpue, na.rm=T)),
+     main=tit, cex.main=5,cex.lab=3,cex.axis=3)
+
+     
 
 legend("topright",
        c('CPUE','Effort'),
-       pch=c(1,2),lty=c(1,2),lwd=c(3,2),col=c(1,2))
+       pch=c(1,2),lty=c(1,2),lwd=c(3,2),col=c(1,2),cex=3)
 
 par(new=T)
-plot(as.numeric(names(cpue)),Seff,ylim=c(0,max(Seff, na.rm=T)),axes=F,lwd=3,lty=2,type='b',xlab=' ',ylab='',col=2,pch=2)
-axis(side=4)
-mtext(side=4,line=3.0,"Standardised Effort")
+par(mar=c(8, 10, 6, 8)+0.1,
+    mgp=c(5,2,0))
+
+plot(as.numeric(names(cpue)),Seff,ylim=c(0,max(Seff, na.rm=T)),axes=F,lwd=3,lty=2,type='b',xlab=' ',ylab='',col=2,pch=2,cex=2)
+axis(side=4,cex.lab=3,cex.axis=3)
+mtext(side=4,line=5.0,"Standardised Effort",cex = 3)
 par(xaxs="r")
 
 dev.off()
 
 ##############################################
 taf.png("effort_fbar")
-par(mar=c(5, 4, 4, 5)+0.1,xpd=TRUE)
+
+par(mar=c(8, 10, 6, 8)+0.1,
+    mgp=c(5,2,0))
 
 a<-Read.summary.data_TAF()
 
@@ -123,58 +149,69 @@ tab1<-tapply(a$FF,list(a$Year,a$Age),sum)
 f<-apply(tab1[,2:3],MARGIN = 1,mean)
 
 tit="Annual Effort and Fbar"
-plot(years,Seff,type='b',xlab=' ',ylab="Standardised effort",col=1,lty=1,lwd=3,pch=1,ylim=c(0,max(Seff, na.rm=T)),main=tit)
+
+plot(years,Seff,type='b',xlab='Year',ylab="Standardised effort",
+     col=1,lty=1,lwd=3,cex=2,pch=1,ylim=c(0,max(Seff, na.rm=T)),
+     main=tit, cex.main=5,cex.lab=3,cex.axis=3)
 
 
 legend("topright",
        c('Total effort',"Fbar"),
-       pch=c(1,2),lty=c(1,2),lwd=c(3,2),col=c(1,2))
-par(new=T)
-plot(years,f[-length(f)],ylim=c(0,max(f, na.rm=T)),axes=F,lty=2,lwd=2,type='b',xlab=' ',col=2,pch=2,ylab="")
-axis(side=4)
+       pch=c(1,2),lty=c(1,2),lwd=c(3,2),col=c(1,2),cex=3)
 
-mtext(side=4,line=3.0,"Fishing mortality age 1-2")
+par(new=T)
+
+plot(years,f[-length(f)],ylim=c(0,max(f, na.rm=T)),axes=F,lty=2,lwd=2,type='b',xlab='',col=2,pch=2,cex=2,ylab="")
+
+axis(side=4,cex.axis=3,cex.lab=2)
+mtext(side=4,line=5.0,"Fishing mortality age 1-2",cex=3)
 par(xaxs="r")
 dev.off()
 
 ###########################
 taf.png("all_effort_Fbar")
-par(mar=c(5, 4, 4, 5)+0.1,xpd=TRUE)
+par(mar=c(8, 10, 8, 7)+0.1,
+    mgp=c(5,2,0))
 
 tit="Effort And Fbar"
-plot(years,Seff,type='b',xlab=' ',ylab="Standardised effort",col=1,lty=1,lwd=3,pch=1,ylim=c(0,max(Seff, na.rm=T)),main=tit)
-lines(years,eff[,1],type='b',col=2,lty=2,lwd=2, pch=2)
-lines(years,eff[,2],type='b',col=3,lty=3,lwd=2, pch=3)
+plot(years,Seff,type='b',xlab='Year',ylab="Standardised effort",
+     col=1,lty=1,lwd=3,pch=1,cex=2, ylim=c(0,max(Seff, na.rm=T)),
+     main=tit,cex.main=5,cex.lab=3,cex.axis=3)
+
+lines(years,eff[,1],type='b',col=2,lty=2,lwd=2, pch=2, cex=2)
+lines(years,eff[,2],type='b',col=3,lty=3,lwd=2, pch=3, cex=2)
 
 legend("topright",
        c('Total effort','effort 1st half','effort 2nd half','F(1-2)'),
-       pch=c(1,2,3,4),lty=c(1,2,3,4),lwd=c(3,2,2,4),col=c(1,2,3,4))
+       pch=c(1,2,3,4),lty=c(1,2,3,4),lwd=c(3,2,2,4),col=c(1,2,3,4),cex=3)
 
 par(new=T)
-plot(years,f[-length(f)],ylim=c(0,max(f, na.rm=T)),axes=F,lwd=4,type='b',xlab=' ',col=4,pch=4,ylab="")
-axis(side=4)
+plot(years,f[-length(f)],ylim=c(0,max(f, na.rm=T)),axes=F,lwd=4,type='b',xlab=' ',col=4,pch=4,ylab="",cex=2)
+axis(side=4,cex.axis=3)
 
-mtext(side=4,line=3.0,"Fishing mortality age 1-2")
+mtext(side=4,line=5.0,"Fishing mortality age 1-2",cex=3)
 par(xaxs="r")
 
 dev.off()
 #################
 taf.png("annual_effort_Fbar")
-par(mar=c(5, 4, 4, 5)+0.1,xpd=TRUE)
+par(mar=c(8, 10, 6, 8)+0.1,
+    mgp=c(5,2,0))
 
 tit<-'Standardised effort and Fbar'
 
-plot(years,Seff,type='b',xlab=' ',ylab='Standardised effort',col=1,lty=1,lwd=3,pch=1,ylim=c(0,max(Seff, na.rm=T)),main=tit)
+plot(years,Seff,type='b',xlab="Year",ylab='Standardised effort',col=1,lty=1,lwd=3,pch=1,cex=2,ylim=c(0,max(Seff, na.rm=T)),
+     main=tit,cex.main=5,cex.lab=3,cex.axis=3)
 
 legend("topright",
        c('Total effort','F(1-2)'),
-       pch=c(1,2),lty=c(1,2),lwd=c(3,3),col=c(1,2))
+       pch=c(1,2),lty=c(1,2),lwd=c(3,3),col=c(1,2),cex=3)
 
 par(new=T)
-plot(years,f[-length(f)],ylim=c(0,max(f, na.rm=T)),axes=F,lwd=3,type='b',xlab=' ',col=2,pch=2,ylab="")
-axis(side=4)
+plot(years,f[-length(f)],ylim=c(0,max(f, na.rm=T)),axes=F,lwd=3,type='b',xlab='',col=2,pch=2,cex=2,ylab="")
+axis(side=4,cex.axis=3)
 
-mtext(side=4,line=3.0,"Fishing mortality age 1-2")
+mtext(side=4,line=5.0,"Fishing mortality age 1-2",cex=3)
 par(xaxs="r")
 dev.off()
 
@@ -196,7 +233,6 @@ plot.survey.residuals_TAF(nox=1,noy=1,start.year=2000,end.year=2020,over.all.max
 ########################
 # Multi Summary (SAG-like)
 
-
 include.terminal.year <- T          # plot terminal year (last assessment year +1) as well?
 include.last.assess.year.recruit <- T          # plot recruits terminal year as well?
 
@@ -215,9 +251,7 @@ nox<-2; noy<-2;
 noxy<-nox*noy
 
 ref<-Read.reference.points_TAF()
-#ref<-Read.reference.points()
 
-#dat<-Read.summary.data(extend=include.terminal.year,read.init.function=F)
 dat<-Read.summary.data_TAF()
 
 
@@ -228,7 +262,8 @@ if (first.year>0) dat<-subset(dat,Year>=first.year )
 sp=1
 sp.name<-"Area-1r"
 discard<-FALSE
-taf.png("Summary", width = 1600, height = 1200,units = "px", pointsize = 30, bg = "white")
+
+taf.png("Summary",units = "px", pointsize = 30, bg = "white")
 par(mfrow=c(2,2))
 par(mar=c(3,4,3,2))
 
@@ -239,7 +274,6 @@ txt<-readLines(file.path("./model","sms.dat"))
 av.F.age<-txt[grep(pattern = "option avg.F.ages", x = txt,fixed = F)+1]
 av.F.age<-as.numeric(unlist(strsplit(av.F.age," "))[c(1,2)])
 names(av.F.age)<-c("first-age","last-age")
-
 s1<-subset(s,s$Age>=av.F.age[1] & s$Age<=av.F.age[2])
 FI<-tapply(s1$F,list(s1$Year),sum)/(av.F.age[2]-av.F.age[1]+1)
 s1<-subset(s,weca>=0 )
@@ -250,15 +284,8 @@ catch<-Yield
 s1<-subset(s,Quarter==1)
 ssb<-tapply(s1$SSB,list(s1$Year),sum)/1000
 
-
-#s2<-subset(s,Age==fa & Quarter==SMS.control@rec.season)
-#Quarter=2 and fa=0 #
-## !!!!!!!!!!!!!!!!!!!
 fa=0
 s2<-subset(s,Age==fa & Quarter==2)
-
-
-ref
 
 rec<-tapply(s2$N,list(s2$Year),sum)/1000000
 year<-as.numeric(unlist(dimnames(ssb)))
@@ -271,13 +298,22 @@ if(include.terminal.year){
 } 
 if(!include.last.assess.year.recruit) rec <- rec[-length(rec)]
 
-barplot(catch,space=1,xlab='',ylab='1000 tonnes',main=paste(sp.name,ifelse(discard,',  Yield and discard',',  Catch'),sep=''),ylim=c(0,max(SOP)))
+par(mar=c(5,7,5,3)+0.1)
+
+barplot(catch,space=1,xlab='',ylab='1000 tonnes',
+        main=paste(sp.name,ifelse(discard,',  Yield and discard',',  Catch'),sep=''),
+        ylim=c(0,max(SOP)),
+        cex.main=3,cex.axis=2,cex.lab=2)
 
 #plot recruits
-barplot(rec,space=1,xlab='',ylab='billions',main=paste('Recruitment age',fa),ylim=c(0,max(rec)))
+barplot(rec,space=1,xlab='',ylab='billions',
+        main=paste('Recruitment age',fa),ylim=c(0,max(rec)),
+        cex.main=3,cex.axis=2,cex.lab=2)
+
 F.max<-max(FI,ref[sp,"Flim"])
 
-plot(year,FI,type='b',lwd=3,xlab='',ylab='',main="Fishing mortality",ylim=c(0,F.max))
+plot(year,FI,type='b',lwd=3,xlab='',ylab='F',main="Fishing mortality",ylim=c(0,F.max),
+     cex.main=3,cex.axis=2,cex.lab=2)
 
 if (incl.reference.points) if (ref[sp,"Flim"]>0) abline(h=ref[sp,"Flim"],lty=2,lwd=2)
 if (incl.reference.points) if (ref[sp,"Fpa"]>0) abline(h=ref[sp,"Fpa"],lty=3,lwd=2)
@@ -285,7 +321,10 @@ grid()
 
 Blim<-ref[sp,"Blim"]/1000; Bpa<-ref[sp,"Bpa"]/1000
 SSB.max<-max(ssb,Bpa)
-plot(year.ssb,ssb,type='b',lwd=3,xlab='',ylab='1000 tonnes',main='SSB',ylim=c(0,SSB.max))
+
+plot(year.ssb,ssb,type='b',lwd=3,xlab='',ylab='1000 tonnes',main='SSB',ylim=c(0,SSB.max),
+     cex.main=3,cex.axis=2,cex.lab=2)
+
 if (incl.reference.points) if (Blim>0) abline(h=Blim,lty=2,lwd=2)
 if (incl.reference.points) if (Bpa>0) abline(h=Bpa,lty=3,lwd=2)
 grid()
@@ -311,9 +350,10 @@ miny =min(dat["Year"])
 maxy =max(dat["Year"])
 if(maxy-miny<10) by=2 else by=4
 
-GP<-ggplot(dat, aes(x=Year, y=scaled, color=age))+geom_line()+theme_bw()+ylab("survey index (scaled)")+
+GP<-ggplot(dat, aes(x=Year, y=scaled, color=age))+geom_line(size=2.1)+theme_bw()+ylab("survey index (scaled)")+
   scale_x_continuous(breaks=seq(miny, maxy, by=by))
-GP<-GP+theme(text = element_text(size=40))
+GP<-GP+theme(text = element_text(size=35))+theme(legend.key.size = unit(3,"line"))
+
 print(GP)
 dev.off()
 ########################################
@@ -323,9 +363,15 @@ dev.off()
 source("SSB_R_plot.R")
 
 ######################
+
 taf.png("Model_Output.png")
 
+par(mfrow=c(3,1),
+    mar=c(5,12,1.5,1.5)+0.1,
+    mgp=c(3,2,0))
+
 Arith_log <- c("Arithmetric","Log values")[1]  #select assumed distribution of variables
+
 include.last.assessment.year.recruit<-T       # should be T when the dregde survey data are availeble
 include.TAC.year.SSB<-T                      # should the SSB plot include the SSB for the fisrt year after the assessment year (default TRUE)
 
@@ -333,77 +379,56 @@ confidence<- 0.90  # 90% confidence limits
 
 two<-qt(1-(1-confidence)/2, df = 10000)  # plus minus factor to get confidence interval
 
-plot.CV<-function(var.name='hist_SSB') {
+VAR.NAMES=c('avg_sumF','hist_SSB','rec_sd') 
+ylabs=c("Average F","SSB (1000 t)","Recruitment (10^6)")
+
+
+for(i in 1:3){
+  
+  var.name=VAR.NAMES[i]
+  ytitl<-ylabs[i]
   
   ref<-Read.reference.points_TAF()
-  
   tmp<-Read.SMS.std_TAF()
-  
   tmp$name[tmp$name=="next_SSB"]<-'hist_SSB'
   
-  a<-subset(tmp,name==var.name & species>0 ,drop=TRUE)
-  a$Species<-"Area-1r"
   
-  if (var.name %in% c('hist_SSB','hist_log_SSB'))  ytitl<-"SSB (1000 t)"  else if (var.name %in% c('avg_sumF','avg_log_sumF')) ytitl<-"Average F"  else if (var.name %in% c('rec_sd','log_recsd')) ytitl<-"Recruitment (10^6)" else if (var.name=='M2_sd0' | var.name=='M2_sd1') ytitl<-"M2"  else stop("name must be hist_SSB or avg_F")
+  a<-subset(tmp,name==var.name & species>0 ,drop=TRUE)
+  a$Species<-"Area-1r";sp <-1
+  
   
   if (var.name=='rec_sd') {
     a$value<-a$value/1000
     a$std<-a$std/1000
     if (include.last.assessment.year.recruit==F) {
       a<-subset(a,year!=read.sms.dat_TAF("last.year.model"))
-    } 
-  }
-  
-  if (var.name=='log_recsd') {
-    a$value<- a$value-log(1000)
-    if (include.last.assessment.year.recruit==F) {
-      a<-subset(a,year!=read.sms.dat_TAF("last.year.model"))
-    } 
-  }
-  
-  if (var.name=='hist_SSB') {
-    a$value<-a$value/1000
-    a$std<-a$std/1000
-    if (!include.TAC.year.SSB) {
-      maxy<-max(a$year)
-      a<-subset(a,year<=maxy)
     }
   }
   
-  if (var.name=='hist_log_SSB') {
-    a$value<-a$value-log(1000)
-    if (!include.TAC.year.SSB) {
-      maxy<-max(a$year)
-      a<-subset(a,year<=maxy)
-    }
-  }
- 
-  #lets assume arithmetric
-  x=a
-  minval<-min(x$value-2*x$std*2,0)  # plotting y-axis range
-  maxval<-max(x$value+1.25*x$std*2) # plotting y-axis range
-  plot( x$year,x$value,xlab='',ylab=ytitl,ylim=c(minval,maxval),type='b',xlim=c(1980,2020))
-  lines(x$year,x$value-two*x$std,lty=2)
-  lines(x$year,x$value+two*x$std,lty=2)
+  minval<-min(a$value-2*a$std*2,0)  # plotting y-axis range
+  maxval<-max(a$value+1.25*a$std*2) # plotting y-axis range
   
-  sp<-1
   
-  if (var.name %in% c('avg_sumF','avg_log_sumF')) {
+  plot(a$year,a$value,xlab='',ylab="",ylim=c(minval,maxval),type='b',xlim=c(1980,2020),
+       cex.lab=3,cex=2,cex.axis=2,lwd=2)
+  
+  lines(a$year,a$value-two*a$std,lty=2,lwd=2)
+  lines(a$year,a$value+two*a$std,lty=2,lwd=2)
+  
+  mtext(side=2,line=2,ytitl,cex=3)
+  
+  #add ref lines where needed
+  if (var.name == 'avg_sumF') {
     if (ref[sp,"Flim"]>0) abline(h=ref[sp,"Flim"],lty=2,lwd=2)
     if (ref[sp,"Fpa"]>0) abline(h=ref[sp,"Fpa"],lty=3,lwd=2)
   }
-  if (var.name %in% c('hist_SSB','hist_log_SSB')) {
-    Blim<-ref[sp,"Blim"]/1000; Bpa<-ref[sp,"Bpa"]/1000
+  
+  if (var.name == 'hist_SSB') {
+    Blim<-ref[sp,"Blim"]; Bpa<-ref[sp,"Bpa"]
     if (Blim>0) abline(h=Blim,lty=2,lwd=2)
     if (Bpa>0) abline(h=Bpa,lty=3,lwd=2)
   }
-}  
-
-par(mfrow=c(3,1))
-par(mar=c(3,5,1,2))  
-plot.CV(var.name='avg_sumF') 
-plot.CV(var.name='hist_SSB')  
-plot.CV(var.name='rec_sd') 
+}
 
 dev.off()
 

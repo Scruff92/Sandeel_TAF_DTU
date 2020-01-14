@@ -177,7 +177,8 @@ Read.SSB.Rec.data_TAF<-function()
 {
   file<-file.path("./model",'ssb_r.out')
   s<-read.table(file,header=TRUE)
-  data.frame(Species="Area-1r",s)}
+  data.frame(Species="Area-1r",s)
+  }
 
 
 ##################

@@ -1,8 +1,8 @@
 ## Prepare tables for report
 
 ## Before: catage.csv, effort.csv, maturity.csv, natmort.csv, survey.csv,
-##         wcatch.csv (data), fatage.csv, natage.csv, summary.csv (output)
-## After:  catage.csv, effort.csv, fatage.csv, maturity.csv, natage.csv,
+##         wcatch.csv (data), fatage.csv, fatage_annual.csv, natage.csv, summary.csv (output)
+## After:  catage.csv, effort.csv, fatage.csv, fatage_annual.csv  maturity.csv, natage.csv,
 ##         natmort.csv, summary.csv, survey.csv, wcatch.csv  forecast_input.csv (report)
 ##        
 
@@ -60,45 +60,11 @@ fatage <- read.taf("output/fatage.csv")
 fatage <- sandeel.table(fatage, digits=3)
 write.taf(fatage, dir="report", quote=TRUE)  # commas in colnames
 
-## fatage_annual (xtab, trim col, col mean, round, aggregate to year, Fbar(1-2))
-#Working progress 
-fatage_annual <- read.taf("output/fatage.csv")
-fatage_annual <- aggregate(cbind(`0`,`1`,`2`,`3`,`4+`)~Year,data = fatage_annual,sum)
-
-colnames(fatage_annual)<-c("Year", "Age 0","Age 1","Age 2","Age 3","Age 4+")
-
-fatage_annual["Avg. 1-2"] <- rowMeans(fatage_annual[c("Age 1","Age 2")])
-
-fatage_annual <- rbind(fatage_annual, colMeans(fatage_annual))
-fatage_annual[nrow(fatage_annual),1] <- "arith. mean"
-fatage_annual <- rnd(fatage_annual, -1, 3)
-
-write.taf(fatage_annual, dir="report", quote=TRUE)  # commas in colnames
 ###################
-#fatage 2 (different method)
-a<-Read.summary.data_TAF()
-
-a$deadM<-a$N.bar*a$M
-a$deadC<-a$N.bar*a$F
-a$deadAll<-a$N.bar*a$Z
-
-a<-subset(a,select=c(Year,Age,deadM,deadC,deadAll,Z))
-a<-aggregate(list(deadM=a$deadM,deadC=a$deadC,deadAll=a$deadAll,Z=a$Z),list(Year=a$Year,Age=a$Age),sum)
-a$FF <- a$Z * a$deadC /a$deadAll
-a$M<- a$Z*a$deadM/a$deadAll
-
-tab1<-tapply(a$FF,list(a$Year,a$Age),sum)
-Fbar_Ages=1:2
-tmp<-tab1[,as.character(Fbar_Ages)]
-tab1<-cbind(tab1,rowMeans(tmp))
-
-colnames(tab1)<-c(paste("Age",seq(0,4)),paste("Avg. ",Fbar_Ages[1],'-',Fbar_Ages[2],sep=''))
-rnames<-rownames(tab1)
-tab1<-rbind(tab1,colMeans(tab1))
-rownames(tab1)<-c(rnames,'arith. mean')
-tab1
-write.taf(tab1,dir="report", quote=TRUE,file = "fatage_annual_2")
-
+#fatage_annual
+fatage_annual <- read.taf("output/fatage_annual.csv")
+fatage_annual <- rnd(fatage_annual, digits=3,cols = 2:7)
+write.taf(fatage_annual, dir="report", quote=TRUE) 
 ######################
 ## natage (realign step, add current, round)
 natage <- read.taf("output/natage.csv")
