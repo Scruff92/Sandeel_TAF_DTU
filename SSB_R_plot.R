@@ -129,4 +129,3 @@ if (include.CV) {#confidence intervals
 if (model==100) abline(v=beta/1000,lty=2,lwd=2)#vertical regression breakpoint
 
 dev.off()
-

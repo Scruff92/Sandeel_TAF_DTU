@@ -1,4 +1,4 @@
-## Prepare tables for report
+### Prepare tables for report
 
 ## Before: catage.csv, effort.csv, maturity.csv, natmort.csv, survey.csv,
 ##         wcatch.csv (data), fatage.csv, fatage_annual.csv, natage.csv, summary.csv (output)
@@ -104,3 +104,19 @@ colnames(oo)[1]<-"Variable"
 
 write.taf(oo,dir="report",file="forecast_input.csv")
 
+#################################################
+## SSB, REC and Fbar with uncertainties
+# Note these values do not come from summary out, instead from SMS.std. Therefore values are slightly different
+###Arith log is either "Arithmetric" or "Log values". This is originally set at the beginning of output.
+#print(Arith_log)
+
+if (Arith_log == "Arithmetric") {
+  s<- read.taf(file = "output/arithmetric_values.csv")  
+} else {s<-read.taf(file = "output/logarithmic_values.csv")}
+
+s<-rnd(s,cols = 2:7)
+s<-rnd(s,cols = 8:10,digits = 3)
+
+if (Arith_log == "Arithmetric") {
+  write.taf(s,file = "arithmetric_values.csv",dir="report")  
+} else {write.taf(s,file = "logarithmic_values.csv",dir="report")}

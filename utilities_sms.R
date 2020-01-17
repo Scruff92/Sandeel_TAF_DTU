@@ -197,10 +197,5 @@ return(tmp)
 ## Taken from the Sandeel utilities
 
 #Stripped down function for TAF
-
-source("FUNCcatchresidplot_TAF.R")
-
-###################
-#
-source("FUNCsurveyresidplot_TAF.R")
+source("FUNC_resids.R")
 

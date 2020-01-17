@@ -4,6 +4,14 @@
 ## After:  fatage.csv, fatage_annual.csv natage.csv, summary.csv, transcript.txt 
 ##         forecast_input.csv forecast_basis.csv, forecast_output.csv (output)
 
+
+
+#Arith log is either "Arithmetric" or "Log values". This is used for model output, uncertainities plots and table.
+Arith_log <- c("Arithmetric","Log values")[2]  #select assumed distribution of variables
+include.last.assessment.year.recruit<-T       # should be T when the dregde survey data are availeble
+
+
+
 library(icesTAF)
 source("utilities_sms.R")
 
@@ -77,6 +85,65 @@ write.taf(summary)
 writeLines(transcript, "transcript.txt")
 setwd("..")
 
-#Forecast input, basis and output
+## Forecast input, basis and output
 source("Forecast.R")
+
+## SSB, Rec and F with uncertaintity
+
+# Note these values do not come from summary out, instead from SMS.std. Therefore values are slightly different
+###Arith log is either "Arithmetric" or "Log values". This is originally set at the beginning of output.
+#print(Arith_log)
+
+tmp<-Read.SMS.std_TAF()
+tmp$Species<-"Area-1r"
+
+
+confidence<- 0.90  # 90% confidence limits
+
+two<-qt(1-(1-confidence)/2, df = 10000)  # plus minus factor to get confidence interval
+
+
+if (Arith_log == "Arithmetric") {
+  tmp$name[tmp$name=="next_SSB"]<-'hist_SSB'
+  a<-tmp[tmp$name %in% c("hist_SSB","avg_sumF","rec_sd"),]
+} else if (Arith_log == "Log values"){
+  tmp$name[tmp$name=="next_log_SSB"]<-'hist_log_SSB'
+  a<-tmp[tmp$name %in% c("hist_log_SSB","avg_log_sumF","log_recsd"),]
+}
+
+if (Arith_log == "Arithmetric") a<-data.frame(Species="Area-1r",Year=a$year, variable=a$name,value=a$value,std=a$std,CV=a$std/a$value*100)
+if (Arith_log == "Log values")  a<-data.frame(Species="Area-1r",Year=a$year, variable=a$name,value=a$value,std=a$std,CV=a$std)
+if (include.last.assessment.year.recruit==F) {
+  a<-a[a$Year != read.sms.dat_TAF("last.year.model") | a$variable != "rec_sd",]
+} 
+
+if (Arith_log == "Arithmetric") {
+  a$upper<-a$value+two*a$std
+  a$lower<-a$value-two*a$std
+}else if (Arith_log == "Log values") {
+  a$upper<-exp(a$value+two*a$std)
+  a$lower<-exp(a$value-two*a$std)
+  a$value<-exp(a$value)
+}
+
+a$titl<- ifelse (a$variable %in% c('hist_SSB','hist_log_SSB'),"SSB", ifelse(a$variable %in% c('avg_sumF','avg_log_sumF'),"Average F",ifelse(a$variable %in% c('rec_sd','log_recsd'), "Recruitment",'error')))
+years<-sort(unique(a$Year))
+b<-matrix(NA,ncol=9,nrow=length(years))
+rownames(b)<-as.character(years)
+colnames(b)<-c('Recruitment','High','Low','SSB','High','Low','F ages 1-2','High','Low')
+aa<-aggregate(cbind(value,upper,lower)~Year+titl,data=a,sum)
+a2 <- as.matrix(aa[aa$titl=="Recruitment",c("value","upper","lower")],ncol=3)
+b[1:dim(a2)[[1]],1:3]<- a2
+a2 <- as.matrix(aa[aa$titl=="SSB",c("value","upper","lower")],ncol=3)
+b[1:dim(a2)[[1]],4:6]<- a2
+a2 <- as.matrix(aa[aa$titl=="Average F",c("value","upper","lower")],ncol=3)
+b[1:dim(a2)[[1]],7:9]<- a2
+
+b <- xtab2taf(b,"Year")
+write.taf(natmort, dir="output", quote=TRUE)  # commas in colnames
+
+if (Arith_log == "Arithmetric") {
+  suppressWarnings(write.taf(b,file = "arithmetric_values.csv",dir="ouput"))
+} else { suppressWarnings(write.taf(b,file = "logarithmic_values.csv",dir = "output"))}
+
 

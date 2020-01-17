@@ -2,18 +2,18 @@
 
 ## Before: catage.csv, wcatch.csv effort.csv (data)
 #          summary.out (model)
-## After:  catage.png, wcatch.png all_effort.png cpue_effort.png
-#           effort_fbar.png all_effort_Fbar.png  catch_residuals_1.png 
-#           catch_residuals_1.png (report)
-
+## After:  catage.png, wcatch.png, all_effort.png, cpue_effort.png,
+#          effort_fbar.png, all_effort_Fbar.png, catch_residuals.png,  
+#          annual_effort_Fbar.png, Model_Output.png, SSB_R.png,
+#          Summary.png, survey_index_scaled.png, Survey_resids_Fleet_1.png,
+#          Survey_resids_Fleet_2.png (report)
 
 #NOTES: Why is Fbar diferent between summary out tables?
 
 library(icesTAF)
 library(ggplot2)
 suppressPackageStartupMessages(library(cowplot)) 
-library(ggplot2)
-
+options(bitmapType = "cairo")
 source("utilities_sms.R")
 
 mkdir("report")
@@ -24,6 +24,7 @@ mkdir("report")
 years <- read.sms.dat_TAF("first.year"):read.sms.dat_TAF("last.year")
 
 ###############################
+## Catch at age
 taf.png("catage")
 catage <-read.csv("data/catage.csv")
 catage <- aggregate(cbind(X0,X1,X2,X3,X4.)~Year,data = catage,sum)
@@ -48,6 +49,7 @@ GP<-ggplot(catprop_long, aes(x=Year, y=Fmort))+geom_col(aes(fill=Age),col="black
 print(GP)
 dev.off()
 ################################
+## Weight of catch
 taf.png("wcatch")
 
 par(mar=c(5,7,5,7)+0.1,mgp=c(5,2,0))
@@ -55,7 +57,6 @@ wcatch <- read.taf("data/wcatch.csv")
 wcatch <- step2long(wcatch)
 wcatch$Label <- factor(wcatch$Step,
                        labels=c("First half year", "Second half year"))
-
 
 GP <- ggplot(wcatch[!wcatch$Age=="0" | !wcatch$Step==1,],aes(x = Year,y=Value,col=Age))+
   geom_line(size=2)+geom_point(cex=0.3,pch=3)+
@@ -66,12 +67,10 @@ GP <- ggplot(wcatch[!wcatch$Age=="0" | !wcatch$Step==1,],aes(x = Year,y=Value,co
   theme(legend.key.size = unit(3,"line"))
 
 print(GP)
-
 dev.off()
 
 ###################################
-
-
+## All effort
 taf.png("all_effort")
 par(mar=c(5, 4, 4, 5)+0.1,xpd=TRUE)
 
@@ -89,7 +88,7 @@ legend("topright",
 
 dev.off()
 ###################################
-
+## CPUE effort
 taf.png("cpue_effort")
 par(mar=c(5, 4, 4, 5)+0.1,xpd=TRUE)
 
@@ -97,7 +96,6 @@ a<-Read.summary.data_TAF()
 Yield<-tapply(a$Yield,list(a$Year),sum)
 Yield<-Yield[-nrow(Yield)]
 cpue<-Yield/Seff
-
 cpue[Seff<10]<-NA
 
 tit<-'Catch per Standardised day fishing'
@@ -117,6 +115,7 @@ par(xaxs="r")
 dev.off()
 
 ##############################################
+## Effort and F-bar
 taf.png("effort_fbar")
 par(mar=c(5, 4, 4, 5)+0.1,xpd=TRUE)
 
@@ -133,12 +132,13 @@ tab1<-tapply(a$FF,list(a$Year,a$Age),sum)
 f<-apply(tab1[,2:3],MARGIN = 1,mean)
 
 tit="Annual Effort and Fbar"
-plot(years,Seff,type='b',xlab=' ',ylab="Standardised effort",col=1,lty=1,lwd=3,pch=1,ylim=c(0,max(Seff, na.rm=T)),main=tit)
 
+plot(years,Seff,type='b',xlab=' ',ylab="Standardised effort",col=1,lty=1,lwd=3,pch=1,ylim=c(0,max(Seff, na.rm=T)),main=tit)
 
 legend("topright",
        c('Total effort',"Fbar"),
        pch=c(1,2),lty=c(1,2),lwd=c(3,2),col=c(1,2))
+
 par(new=T)
 plot(years,f[-length(f)],ylim=c(0,max(f, na.rm=T)),axes=F,lty=2,lwd=2,type='b',xlab=' ',col=2,pch=2,ylab="")
 axis(side=4)
@@ -148,6 +148,7 @@ par(xaxs="r")
 dev.off()
 
 ###########################
+## All effort and F-bar
 taf.png("all_effort_Fbar")
 par(mar=c(5, 4, 4, 5)+0.1,xpd=TRUE)
 
@@ -169,6 +170,7 @@ par(xaxs="r")
 
 dev.off()
 #################
+## Annual Effort and F-bar
 taf.png("annual_effort_Fbar")
 par(mar=c(5, 4, 4, 5)+0.1,xpd=TRUE)
 
@@ -190,18 +192,11 @@ dev.off()
 
 ##################### 
 # Catch Residuals Bubble
-# This function originally used two nested functions: plot.catch.residuals2 and residplot
-# I have combined them in one script (FUNCresidplot_TAF) and stripped out some of the excess functionality 
-# search taf.png in function to see the actual plotting line and change dimensions accordingly and include "save" code
-# dev.off() is applied at end of the outer funnction
-# setwd() is also manually set in residplot_TAF
-
 plot.catch.residuals_TAF()
 
 ###########################
 #Survey Residuals Bubble
 plot.survey.residuals_TAF(nox=1,noy=1,start.year=2000,end.year=2020,over.all.max=1)
-
 
 ########################
 # Multi Summary (SAG-like)
@@ -217,32 +212,21 @@ OperatingModel<-F
 redefine.scenario.manually<-T
 
 palette("default")
-
-
 nox<-2; noy<-2;
 noxy<-nox*noy
-
 ref<-Read.reference.points_TAF()
-#ref<-Read.reference.points()
-
-#dat<-Read.summary.data(extend=include.terminal.year,read.init.function=F)
 dat<-Read.summary.data_TAF()
-
-
 dat<-subset(dat,Year<=last.year )
-
 if (first.year>0) dat<-subset(dat,Year>=first.year )
-
 sp=1
 sp.name<-"Area-1r"
 discard<-FALSE
+
 taf.png("Summary", width = 1600, height = 1200,units = "px", pointsize = 30, bg = "white")
 par(mfrow=c(2,2))
 par(mar=c(3,4,3,2))
 
 s<-subset(dat,Species.n==1)
-
-#av.F.age<-SMS.control@avg.F.ages[sp-first.VPA+1,]
 txt<-readLines(file.path("./model","sms.dat"))
 av.F.age<-txt[grep(pattern = "option avg.F.ages", x = txt,fixed = F)+1]
 av.F.age<-as.numeric(unlist(strsplit(av.F.age," "))[c(1,2)])
@@ -258,16 +242,8 @@ catch<-Yield
 s1<-subset(s,Quarter==1)
 ssb<-tapply(s1$SSB,list(s1$Year),sum)/1000
 
-
-#s2<-subset(s,Age==fa & Quarter==SMS.control@rec.season)
-#Quarter=2 and fa=0 #
-## !!!!!!!!!!!!!!!!!!!
 fa=0
 s2<-subset(s,Age==fa & Quarter==2)
-
-
-ref
-
 rec<-tapply(s2$N,list(s2$Year),sum)/1000000
 year<-as.numeric(unlist(dimnames(ssb)))
 year.ssb<-year
@@ -300,7 +276,6 @@ grid()
 
 dev.off()
 
-
 #######################################################
 #Dredge survey index timeline (scaled)
 taf.png("survey_index_scaled")
@@ -314,8 +289,8 @@ dat11$scaled[dat11$Age=="X0"]<-scale(dat11$Value[dat11$Age=="X0"])
 dat11$scaled[dat11$Age=="X1"]<-scale(dat11$Value[dat11$Age=="X1"])
 dat11$Age<-factor(dat11$Age,labels=c("0","1"))
 dat<-dat11
-#format like previous program
 
+#format like previous program
 miny =min(dat["Year"])
 maxy =max(dat["Year"])
 if(maxy-miny<10) by=2 else by=4
@@ -328,27 +303,21 @@ GP<-GP+theme(text = element_text(size=35))+theme(legend.key.size = unit(3,"line"
 print(GP)
 dev.off()
 ########################################
-
 #SSB _ R relationship
-
 source("SSB_R_plot.R")
 
 ######################
-
+#Model Output
 taf.png("Model_Output.png")
+
+#Arith log is either "Arithmetric" or "Log values". This is originally set at the beginning of output.
+#print(Arith_log)
 
 par(mfrow=c(3,1),
     mar=c(5,12,1.5,1.5)+0.1,
     mgp=c(3,2,0))
 
-Arith_log <- c("Arithmetric","Log values")[1]  #select assumed distribution of variables
-
-include.last.assessment.year.recruit<-T       # should be T when the dregde survey data are availeble
 include.TAC.year.SSB<-T                      # should the SSB plot include the SSB for the fisrt year after the assessment year (default TRUE)
-
-confidence<- 0.90  # 90% confidence limits
-
-two<-qt(1-(1-confidence)/2, df = 10000)  # plus minus factor to get confidence interval
 
 VAR.NAMES=c('avg_sumF','hist_SSB','rec_sd') 
 ylabs=c("Average F","SSB (1000 t)","Recruitment (10^6)")
@@ -362,8 +331,6 @@ for(i in 1:3){
   ref<-Read.reference.points_TAF()
   tmp<-Read.SMS.std_TAF()
   tmp$name[tmp$name=="next_SSB"]<-'hist_SSB'
-  
-  
   a<-subset(tmp,name==var.name & species>0 ,drop=TRUE)
   a$Species<-"Area-1r";sp <-1
   
@@ -373,6 +340,11 @@ for(i in 1:3){
     if (include.last.assessment.year.recruit==F) {
       a<-subset(a,year!=read.sms.dat_TAF("last.year.model"))
     }
+  }
+  
+  if(var.name=="hist_SSB"){
+    a$value <- a$value/1000
+    a$std <- a$std/1000
   }
   
   minval<-min(a$value-2*a$std*2,0)  # plotting y-axis range
@@ -393,22 +365,96 @@ for(i in 1:3){
   
   if (var.name == 'hist_SSB') {
     Blim<-ref[sp,"Blim"]; Bpa<-ref[sp,"Bpa"]
-    if (Blim>0) GP<- GP+geom_hline(yintercept =Blim,lty=2)
-    if (Bpa>0)  GP<- GP+geom_hline(yintercept =Bpa,lty=3)
+    if (Blim>0) GP<- GP+geom_hline(yintercept =Blim/1000,lty=2)
+    if (Bpa>0)  GP<- GP+geom_hline(yintercept =Bpa/1000,lty=3)
   }
   
   assign(x=paste0("GP",i),GP)
   
 }
 
-
 print(plot_grid(GP1,GP2,GP3,ncol = 1))
 dev.off()
 
-#If the confidence intervals are not plotted, run this line first
-#options(bitmapType = "cairo")
+#######################################
+# Model Uncertainties
+taf.png("Model_Uncertainties")
 
+#Arith log is either "Arithmetric" or "Log values". This is originally set at the beginning of output.
+#print(Arith_log)
+
+tmp<-Read.SMS.std_TAF()
+tmp$Species<-"Area-1r"
+
+if (Arith_log == "Arithmetric") {
+  tmp$name[tmp$name=="next_SSB"]<-'hist_SSB'
+  a<-tmp[tmp$name %in% c("hist_SSB","avg_sumF","rec_sd"),]
+} else if (Arith_log == "Log values"){
+  tmp$name[tmp$name=="next_log_SSB"]<-'hist_log_SSB'
+  a<-tmp[tmp$name %in% c("hist_log_SSB","avg_log_sumF","log_recsd"),]
+}
+
+if (Arith_log == "Arithmetric") a<-data.frame(Species="Area-1r",Year=a$year, variable=a$name,value=a$value,std=a$std,CV=a$std/a$value*100)
+if (Arith_log == "Log values")  a<-data.frame(Species="Area-1r",Year=a$year, variable=a$name,value=a$value,std=a$std,CV=a$std)
+
+if (include.last.assessment.year.recruit==F) {
+  a<-a[a$Year != read.sms.dat_TAF("last.year.model") | a$variable != "rec_sd",]
+} 
+a$titl<- ifelse (a$variable %in% c('hist_SSB','hist_log_SSB'),"SSB", ifelse(a$variable %in% c('avg_sumF','avg_log_sumF'),"Average F",ifelse(a$variable %in% c('rec_sd','log_recsd'), "Recruitment",'error')))
+
+if (Arith_log == "Arithmetric") ylab<-'Coefficient of Variation (%)'  else ylab<-"standard deviation of log values (sigma)"             
+
+for(i in 1:3){
+  a0<-a[a$titl==unique(a$titl)[i],]
+  GP <- ggplot(a0,aes(x=Year,y=CV))+geom_line()+geom_point(size=4,shape=16)+
+    theme(text = element_text(size=35))+
+    ggtitle(unique(a$titl)[i])+ylab("")
+  
+  #Title
+  title_vertical_displacement<-35
+  if(i==3){
+    if(Arith_log == "Log values"){
+      tit<- capture.output(cat(rep("\t",title_vertical_displacement),"Standard Deviation of Log Values (sigma)"))
+      GP <- GP+ylab(tit)
+    }else{
+      tit<- capture.output(cat(rep("\t",title_vertical_displacement),"Standard Deviation of Values (sigma)"))
+      GP <- GP+ylab(tit)
+    }
+  }
+  assign(x = paste0("GP",i),GP)
+}
+
+print(plot_grid(GP1,GP2,GP3,ncol = 1))
+
+dev.off()
+
+
+#########################################
+## Internal Consistancy
+taf.png("internal_consistancy")
+
+d = read.csv(file.path('./data','survey.csv')) 
+d0 = taf2long(x=d, names = c("Year","Age","CPUE"))
+d0$Age = as.numeric(gsub("X", "", d0$Age))
+
+d0$CPUEnext=d0$CPUE[pmatch(paste(d0$Year+1, d0$Age+1), paste(d0$Year, d0$Age))]
+d1 = na.omit(d0)
+d1$Age=factor(d1$Age)
+
+#Calculate R2 values
+r2=summary(lm(log(CPUEnext)~log(CPUE),data = d1))$r.squared
+minx=min(log(d1$CPUE), na.rm=TRUE)
+maxy=max(log(d1$CPUEnext), na.rm=TRUE)
+
+p1<-ggplot(d1, aes(x=log(CPUE), y=log(CPUEnext)))+
+  geom_point(size=8)+geom_smooth(method="lm", se=FALSE, colour="black",size=3)+
+  xlab("log(CPUE Age 0)")+ylab("log(CPUE Age 1)")+
+  geom_point(data=d1[d1$Year==max(d1$Year),], colour="red",size=8)+
+  geom_text(data=d1, check_overlap="true",  
+            aes(x=minx+1.5, y=maxy*.99, label=paste0("Rsquared = ", round(r2,2))),size=15)+
+  theme(text=element_text(size = 42))
+
+print(p1)
+dev.off()
 ######################################
-
-
-
+##               END                ##
