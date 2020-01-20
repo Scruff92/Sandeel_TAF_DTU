@@ -18,8 +18,6 @@ source("utilities_sms.R")
 
 mkdir("report")
 
-
-
 #For use later in the script
 years <- read.sms.dat_TAF("first.year"):read.sms.dat_TAF("last.year")
 
