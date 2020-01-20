@@ -242,7 +242,12 @@ catch<-Yield
 s1<-subset(s,Quarter==1)
 ssb<-tapply(s1$SSB,list(s1$Year),sum)/1000
 
-fa=0
+#
+if(!"fa" %in% ls())  {fa=0}
+# This is likely age at recruitment but it is not certain. 
+# It is set in the retrospective script so it will try to inherit.
+
+
 s2<-subset(s,Age==fa & Quarter==2)
 rec<-tapply(s2$N,list(s2$Year),sum)/1000000
 year<-as.numeric(unlist(dimnames(ssb)))
@@ -456,5 +461,10 @@ p1<-ggplot(d1, aes(x=log(CPUE), y=log(CPUEnext)))+
 
 print(p1)
 dev.off()
+
 ######################################
+## Retrospective
+cp(from = "model/retro/retro_output/retro.png","report/")
+
+
 ##               END                ##

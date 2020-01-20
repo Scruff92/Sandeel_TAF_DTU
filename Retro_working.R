@@ -1,12 +1,12 @@
 # user options
-setwd("/home/rocco-zissou/Documents/ICES/Sandeel_TAF_DTU/")
 source("utilities_sms.R")
-
-
 library(FLCore)
+
 # first and last year for retro analysis of the most recent period
 f.year<-2013
 l.year<-2018  #cannot be larger than the last year with catches
+
+fa=0 # This seems to be the recruitment age.
 
 addYear<-c(1,0,0); names(addYear)<-c("SSB","REC","FI")  # add year (to terminal year) for presentation for SSB, Recruitment and mean F
 
@@ -67,7 +67,7 @@ retro.years<-l.year:f.year
 if (make.hist.retro) retro.years<-c(-hl.year:-hf.year,retro.years)
 
 for (y in (retro.years)){
-#y=retro.years[1]
+  #y=retro.years[1]
   if (y>0) {
     for (j in 1:length(indices))
     {
@@ -159,7 +159,7 @@ i<-0
 par(mar=c(1,6,2,2))
 
 plot.retro<-function(x,label,main=' ',legend.x=0.15,legend.y=1) { 
-
+  
   rho<-function(x) {
     ny<-dim(x)[[2]] 
     n<-dim(x)[[3]]-1 
@@ -181,35 +181,31 @@ plot.retro<-function(x,label,main=' ',legend.x=0.15,legend.y=1) {
   nyr<-length(retro.years)
   
   #if (i==noxy) {newplot(dev,nox,noy); i<<-0 }
-    
-    plot(yr,x[1,,1],xlab='',ylab=label,main=main,type='b', ylim=c(0,max(x[sp,,],na.rm=T)),lwd=2,pch=1,col=ifelse(retro.years[1]<0,2,1))
-    #legend(x=max(yr)-legend.x*(max(y)-min(yr)),y=max(x)*legend.y,legend=as.character(abs(retro.years)),pch=seq(1,nyr),col=1)
-    if (nyr>1)  { mrho<-rho(x);  legend("topright", legend=paste("Mohn's rho: ",round(mrho,2),'  '), bty="n",cex=1.5) }
-    
-    grid()
-    i<<-i+1
-    for(yy in (2:length(retro.years))) {
-      lines(yr,x[1,,yy],type='b',pch=yy,col=ifelse(retro.years[yy]<0,yy+1,1),lwd=2)
-    }
-  } 
+  
+  plot(yr,x[1,,1],xlab='',ylab=label,main=main,type='b', ylim=c(0,max(x[sp,,],na.rm=T)),lwd=2,pch=1,col=ifelse(retro.years[1]<0,2,1))
+  #legend(x=max(yr)-legend.x*(max(y)-min(yr)),y=max(x)*legend.y,legend=as.character(abs(retro.years)),pch=seq(1,nyr),col=1)
+  if (nyr>1)  { mrho<-rho(x);  legend("topright", legend=paste("Mohn's rho: ",round(mrho,2),'  '), bty="n",cex=1.5) }
+  
+  grid()
+  i<<-i+1
+  for(yy in (2:length(retro.years))) {
+    lines(yr,x[1,,yy],type='b',pch=yy,col=ifelse(retro.years[yy]<0,yy+1,1),lwd=2)
+  }
+} 
 
+dir.create("retro_output")
+setwd("retro_output")
+
+taf.png("retro")
+par(mfrow=c(3,1))
+par(mar=c(3,5,1.5,1)+0.1)
 plot.retro(SSB,'SSB',main=lab,legend.x=0.15)
 plot.retro(FI,expression(bar(F)),legend.x=0.4)
 plot.retro(REC,"recriuts 10^6",legend.x=0.4)
-# 
-# sink(file.path(data.path,retro.dir,'retro_details.out'))
-# cat("  #########################    SSB      ##############################\n\n")
-# print(ftable(SSB[1,,]))
-# plot.retro(SSB,'SSB',main=lab,legend.x=0.15)
-# 
-# cat("\n  #########################    F      ##############################\n\n")
-# print(ftable(FI[1,,]))
-# plot.retro(FI,expression(bar(F)),legend.x=0.4)
-# 
-# cat("\n  #########################  Recruitment      ##############################\n\n")
-# 
-# plot.retro(REC,"recriuts 10^6",legend.x=0.4)
-# print(ftable(REC[1,,]))
-# savePlot(filename= file.path(data.path,'retro',"retro_plot"),type="png")
-# sink()
-# 
+dev.off()
+
+write.taf(as.data.frame(as.matrix(ftable(SSB[1,,]))),file = "retro_SSB.csv",row.names = T)
+write.taf(as.data.frame(as.matrix(ftable(FI[1,,]))),file = "retro_F.csv",row.names = T)
+write.taf(as.data.frame(as.matrix(ftable(REC[1,,]))),file = "retro_REC.csv",row.names = T)
+
+setwd(old.dir)

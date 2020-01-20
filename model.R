@@ -4,6 +4,8 @@
 ## After:  details.out, sms.rep, summary.table.out (model)
 
 library(icesTAF)
+library(FLCore)
+source("utilities_sms.R")
 
 mkdir("model")
 
@@ -21,3 +23,6 @@ cp(file.path("bootstrap/software/sms", exefile), "model")
 setwd("model")
 system("./sms")
 setwd("..")
+
+## Run retrospective analysis
+source("Retro_working.R")

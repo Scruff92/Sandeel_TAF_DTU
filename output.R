@@ -146,4 +146,10 @@ if (Arith_log == "Arithmetric") {
   suppressWarnings(write.taf(b,file = "arithmetric_values.csv",dir="ouput"))
 } else { suppressWarnings(write.taf(b,file = "logarithmic_values.csv",dir = "output"))}
 
+###################
+## Retro tables
+files<-dir("model/retro/retro_output/")
+files<-files[grep(".csv",files)]
+cp(file.path("model/retro/retro_output/",files),to = "output")
+
 

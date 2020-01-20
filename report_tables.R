@@ -120,3 +120,20 @@ s<-rnd(s,cols = 8:10,digits = 3)
 if (Arith_log == "Arithmetric") {
   write.taf(s,file = "arithmetric_values.csv",dir="report")  
 } else {write.taf(s,file = "logarithmic_values.csv",dir="report")}
+
+#################
+## Retro tables
+retro_SSB<- read.taf("output/retro_SSB.csv")
+retro_SSB<-rnd(retro_SSB,digits = 3)
+
+retro_F<- read.taf("output/retro_F.csv")
+retro_F<-rnd(retro_F,digits = 3)
+
+retro_REC<- read.taf("output/retro_REC.csv")
+retro_REC<-rnd(retro_REC,digits = 3)
+
+write.taf(retro_SSB, dir = "report")
+write.taf(retro_F,   dir = "report")
+write.taf(retro_REC, dir = "report")
+
+########################
