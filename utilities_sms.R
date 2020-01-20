@@ -1216,6 +1216,7 @@ read.FLSMS.control_TAF<-function(file="model/sms.dat") {
   opt<-scan(file=file, comment.char = "#",quiet=T) 
   
   n<-1
+  
   control<-new("FLSMS.control")
   n.<-slotNames(control)
   for (x in n.) {
@@ -1295,6 +1296,8 @@ read.FLSMS.control_TAF<-function(file="model/sms.dat") {
   control
 }
 
+
+#######################################################################################
 
 ##########################
 ## RESIDUAL FUNCTIONS
@@ -1401,15 +1404,14 @@ residplot_TAF<-function(residuals, xpos, ypos, maxsize = 0.25, poscol = 2, linec
 
 #Outer Function  for TAF
 
-over.all.max<-6  # use over.all.max different from 0 to set bublesize  
-#over.all.max<-2.5
-
-use.ref.dot<-TRUE
 
 
 plot.catch.residuals_TAF<-function(dev,nox=1,noy=1,Portrait=T,start.year=0,end.year=0,reverse.colors=F,standardize=F,use.ref.dot=TRUE,add.title=TRUE,over.all.max=1.5,my.species=NA) {
   
   taf.png("catch_residuals")
+  
+  
+ use.ref.dot<-TRUE
   
   standardize=F
   dev='screen'
@@ -1554,3 +1556,178 @@ plot.survey.residuals_TAF<-function(nox=1,noy=1,start.year=0,end.year=0,use.ref.
 
 
 
+####
+## This is needed to create new FLSMS class objects
+
+setClass("FLSMS.control",
+         representation(
+           test.output         ="numeric",
+           OP.output           ="numeric",
+           VPA.mode            ="numeric",
+           no.areas            ="numeric",
+           first.year          ="numeric",
+           first.year.model    ="numeric",
+           last.year           ="numeric",
+           last.year.model     ="numeric",
+           last.season         ="numeric",
+           last.season.last.year="numeric",
+           no.species          ="numeric",
+           species.names       ="vector",
+           first.age           ="numeric",
+           rec.season          ="numeric",
+           max.age.all         ="numeric",
+           species.info        ="matrix",
+           use.known.rec       ="numeric",
+           beta.cor            ="vector",
+           SSB.R.year.first    ="vector",
+           SSB.R.year.last     ="vector",
+           obj.func.weight     ="matrix",
+           phase.rec           ="numeric",
+           phase.rec.older     ="numeric",
+           phase.F.y           ="numeric",
+           phase.F.y.spline    ="numeric",
+           phase.F.q           ="numeric",
+           phase.F.a           ="numeric",
+           phase.catchability  ="numeric",
+           phase.SSB.R.alfa    ="numeric",
+           phase.SSB.R.beta    ="numeric",
+           min.catch.CV        ="numeric",
+           min.SR.CV           ="numeric",
+           discard             ="vector",
+           combined.catches    ="vector",
+           seasonal.catch.s2   ="vector",
+           catch.s2.group      ="vector",
+           catch.season.age    ="vector",
+           avg.F.ages          ="matrix",
+           min.catch           ="vector",
+           catch.sep.year      ="vector",
+           catch.spline.year   ="vector",
+           zero.catch.year.season="numeric",
+           zero.catch.season.age="numeric",
+           fix.F.factor        ="vector",
+           est.calc.sigma      ="vector",
+           read.HCR            ="numeric",
+           incl.stom.all       ="numeric",
+           use.Nbar            ="numeric",
+           M2.iterations       ="numeric",
+           max.M2.sum2         ="numeric",
+           stom.likelihood     ="numeric",
+           stomach.variance    ="numeric",
+           simple.ALK          ="numeric",
+           consum              ="numeric",
+           size.select.model   ="numeric",
+           L50.mesh            ="vector",
+           size.selection      ="vector",
+           sum.stom.like       ="vector",
+           stom.obs.var        ="vector",
+           stom.max.sumP        ="vector",
+           var.scale.stom      ="vector",
+           size.other.food.suit="vector",
+           min.stom.cont       ="vector",
+           max.stom.sampl      ="vector",
+           prey.pred.size.fac  ="vector",
+           stom.type.include   ="vector",
+           use.overlap         ="numeric",
+           phase.vulnera       ="numeric",
+           phase.other.suit.slope ="numeric",
+           phase.pref.size.ratio  ="numeric",
+           phase.pref.size.ratio.correction ="numeric",
+           phase.prey.size.adjustment ="numeric",
+           phase.var.size.ratio ="numeric",
+           phase.season.overlap ="numeric",
+           phase.stom.var       ="numeric",
+           phase.mesh.adjust    ="numeric"
+         )
+         ,
+         prototype=prototype(
+           test.output     =0,
+           OP.output       =0,
+           VPA.mode        =0,
+           no.areas        =1,                                            
+           first.year      =1900, 
+           first.year.model=1901,                                            
+           last.year       =1901,                                            
+           last.year.model =1901,                                            
+           last.season     =1,                                            
+           last.season.last.year=1,                                       
+           no.species      =1,  
+           species.names   =as.vector("sp1",mode="character"),                                         
+           first.age       =0,                                            
+           rec.season      =1,                                            
+           max.age.all     =0,                                            
+           species.info    =matrix(0,ncol=11,nrow=1,dimnames=list(c("sp1"),c("last-age","first-age F>0","last-age-selec","effort",
+                                                                             "last-age-likelihood","+group","predator","prey","SSB/R","RecAdd1","RecAdd2"))),
+           use.known.rec   =0,
+           beta.cor        =as.vector(1.0E6,mode="numeric"),
+           SSB.R.year.first=as.vector(0,mode="numeric"),
+           SSB.R.year.last=as.vector(0,mode="numeric"),
+           obj.func.weight =matrix(1,ncol=5,nrow=1,dimnames=list(c("sp1"),c("catch","survey","SSB/R",
+                                                                            "stomach1","stomach2"))),                                        
+           phase.rec       =1,                                                  
+           phase.rec.older =1,                                                   
+           phase.F.y       =1,
+           phase.F.y.spline=-1,
+           phase.F.q       =1,                                                  
+           phase.F.a       =1,                                                  
+           phase.catchability=1,                                                
+           phase.SSB.R.alfa=1,                                                  
+           phase.SSB.R.beta=1,                                                  
+           min.catch.CV    =0.2,                                                
+           min.SR.CV       =0.2,
+           discard         =as.vector(0,mode="list"),
+           combined.catches=as.vector(0,mode="list"),                                                 
+           seasonal.catch.s2=as.vector(0,mode="list"),                                                 
+           catch.s2.group  =as.vector(0,mode="list"),                                       
+           catch.season.age=as.vector(0,mode="list"),                                       
+           avg.F.ages      =matrix(0,ncol=2,nrow=1,dimnames=list(c("sp1"),c("first-age","last-age"))),                                        
+           min.catch       =as.vector(-5,mode="numeric"),                                    
+           catch.sep.year  =as.vector(0,mode="list"),
+           catch.spline.year =as.vector(0,mode="list"),
+           zero.catch.year.season =0,
+           zero.catch.season.age =0,
+           fix.F.factor    = as.vector(1,mode="numeric"),
+           est.calc.sigma  =as.vector(0,mode="numeric"),                                   
+           read.HCR        =0, 
+           incl.stom.all   =0, 
+           use.Nbar        =0,
+           M2.iterations   =3,
+           max.M2.sum2     =0.0, 
+           stom.likelihood     =1,                                              
+           stomach.variance    =1,                                              
+           simple.ALK          =0, 
+           consum              =0,                                            
+           size.select.model   =2, 
+           L50.mesh            =as.vector(0,mode="numeric"),                                                                           
+           size.selection      =as.vector(0,mode="numeric"),  
+           sum.stom.like       =as.vector(0,mode="numeric"),
+           stom.obs.var        =as.vector(0,mode="numeric"),
+           stom.max.sumP        =as.vector(0,mode="numeric"),
+           var.scale.stom      =as.vector(0,mode="numeric"),
+           size.other.food.suit=as.vector(0,mode="numeric"),
+           min.stom.cont       =as.vector(0,mode="numeric"),
+           max.stom.sampl      =as.vector(0,mode="numeric"),
+           prey.pred.size.fac  =as.vector(0,mode="numeric"), 
+           stom.type.include   =as.vector(1,mode="numeric"),                               
+           use.overlap         =0,                                              
+           phase.vulnera       =2,                                             
+           phase.other.suit.slope =2,                                          
+           phase.pref.size.ratio  =2,                                          
+           phase.pref.size.ratio.correction =-1,                                
+           phase.prey.size.adjustment =-1,                                      
+           phase.var.size.ratio =-1,                                            
+           phase.season.overlap =-1,                                            
+           phase.stom.var       =2,
+           phase.mesh.adjust    =-1                                                                                                              
+         )                                                           
+         
+)
+
+
+setClass("FLIndex.SMS",
+         contains="FLIndex",
+         representation(
+           range.SMS="vector"
+         ) ,
+         prototype=prototype(range.SMS=list(season=1, power.age=-1, q.age=0,
+                                            var.age.group=as.vector(0,mode="list"),minCV=0.3))
+) 

@@ -6,7 +6,7 @@ library(FLCore)
 f.year<-2013
 l.year<-2018  #cannot be larger than the last year with catches
 
-fa=0 # This seems to be the recruitment age.
+fa<-read.sms.dat_TAF("first.age")
 
 addYear<-c(1,0,0); names(addYear)<-c("SSB","REC","FI")  # add year (to terminal year) for presentation for SSB, Recruitment and mean F
 

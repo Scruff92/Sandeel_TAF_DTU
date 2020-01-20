@@ -194,6 +194,7 @@ plot.catch.residuals_TAF()
 
 ###########################
 #Survey Residuals Bubble
+
 plot.survey.residuals_TAF(nox=1,noy=1,start.year=2000,end.year=2020,over.all.max=1)
 
 ########################
@@ -241,8 +242,8 @@ s1<-subset(s,Quarter==1)
 ssb<-tapply(s1$SSB,list(s1$Year),sum)/1000
 
 #
-if(!"fa" %in% ls())  {fa=0}
-# This is likely age at recruitment but it is not certain. 
+if(!"fa" %in% ls())  {fa<-read.sms.dat_TAF("first.age")}
+# This is first age. 
 # It is set in the retrospective script so it will try to inherit.
 
 
