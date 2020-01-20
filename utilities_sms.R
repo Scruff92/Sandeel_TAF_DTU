@@ -1406,23 +1406,19 @@ residplot_TAF<-function(residuals, xpos, ypos, maxsize = 0.25, poscol = 2, linec
 
 
 
-plot.catch.residuals_TAF<-function(dev,nox=1,noy=1,Portrait=T,start.year=0,end.year=0,reverse.colors=F,standardize=F,use.ref.dot=TRUE,add.title=TRUE,over.all.max=1.5,my.species=NA) {
+plot.catch.residuals_TAF<-function(start.year=2000,end.year=2020,reverse.colors=F,add.title=TRUE,over.all.max=1.5) {
+  nox=1;noy=1
   
   taf.png("catch_residuals")
-  
   
  use.ref.dot<-TRUE
   
   standardize=F
   dev='screen'
-  # nox=1
-  # noy=2
   Portrait=T
   use.ref.dot=TRUE
   add.title=F
-  #over.all.max=4
-  start.year=1982
-  end.year=2021
+  my.species=NA
   
   
   file<-file.path("model/catch_survey_residuals.out")
@@ -1435,16 +1431,13 @@ plot.catch.residuals_TAF<-function(dev,nox=1,noy=1,Portrait=T,start.year=0,end.y
   
   
   nsp=1
-  
   nox.noy<-5
   plot.no<-0
   
   years<-rep(0,2)
   ages<-rep(0,2)
-  res
   aa<-res
   sp.name<-"Area-1r"
-  
   
   quarters<-unique(aa$Quarter)
   
@@ -1476,8 +1469,9 @@ plot.catch.residuals_TAF<-function(dev,nox=1,noy=1,Portrait=T,start.year=0,end.y
 ##Survey Resids Function
 ############
 
-plot.survey.residuals_TAF<-function(nox=1,noy=1,start.year=0,end.year=0,use.ref.dot=TRUE,add.title=TRUE,over.all.max=6,my.species=NA,standardize=F) {
-  
+plot.survey.residuals_TAF<-function(start.year=1980,end.year=2020,use.ref.dot=TRUE,add.title=TRUE,over.all.max=1.5,standardize=F) {
+  nox=1;noy=1
+  my.species=NA
   fleet.names<-read.fleet_TAF()
   file<-file.path("./model","fleet_info.dat")
   finfo<-scan(file,comment.char = "#",quiet = T) 
@@ -1489,7 +1483,7 @@ plot.survey.residuals_TAF<-function(nox=1,noy=1,start.year=0,end.year=0,use.ref.
   res[res$residual==-99.9 ,'residual']<-NA
   
   max.buble<-max(abs(res$residual),na.rm=TRUE)
-  max.buble=10
+  
   nsp=1
   sp.name<-"Area-1r"
   nox.noy<-nox*noy
@@ -1523,7 +1517,7 @@ plot.survey.residuals_TAF<-function(nox=1,noy=1,start.year=0,end.year=0,use.ref.
     xpos <- as.numeric(dimnames(tmp)[[2]]) # years
     ypos <- as.numeric(dimnames(tmp)[[1]]) #ages
     
-    title<- paste(sp.name," fleet:",f,sep="")#"Area-1r fleet:1"
+    # title<- paste(sp.name," fleet:",f,sep="")#"Area-1r fleet:1"
     title<- fleet.names[1,f]#"RTM 2007-2017"
     
     if (length(ypos)==1) {

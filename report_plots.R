@@ -190,12 +190,12 @@ dev.off()
 
 ##################### 
 # Catch Residuals Bubble
-plot.catch.residuals_TAF()
+plot.catch.residuals_TAF(start.year = 1990,end.year = 2020,over.all.max = 1.5)
 
 ###########################
 #Survey Residuals Bubble
 
-plot.survey.residuals_TAF(nox=1,noy=1,start.year=2000,end.year=2020,over.all.max=1)
+plot.survey.residuals_TAF(start.year=2000,end.year=2020,over.all.max=1.5)
 
 ########################
 # Multi Summary (SAG-like)
