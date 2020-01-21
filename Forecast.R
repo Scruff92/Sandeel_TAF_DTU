@@ -221,8 +221,8 @@ if (Recruit.in.Assess.year>=0) {
   BASIS[5,1] <- paste0("SSB(",TAC.year,")")
   BASIS[5,2] <- round(SSB0,3)
 }
-
-write.taf(BASIS,file = "output/forecast_basis.csv")
+colnames(BASIS)<-c("Basis Reference","Basis Value")
+write.taf(BASIS,file = "forecast_basis.csv",quote = T,dir = "output")
 
 #####
 

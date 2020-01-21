@@ -104,6 +104,18 @@ colnames(oo)[1]<-"Variable"
 
 write.taf(oo,dir="report",file="forecast_input.csv")
 
+
+########################
+## Forecast Basis
+b <- read.taf("output/forecast_basis.csv")
+forecast_basis <- rnd(b,digits = 3,cols = 2)
+write.taf(forecast_basis,dir = "report",quote = T)
+########################
+## Forecast Ouput
+c <- read.taf("output/forecast_output.csv")
+forecast_out <- rnd(c,digits = 3,cols = c(1,3,4,5))
+write.taf(forecast_out,dir = "report",quote = T)
+
 #################################################
 ## SSB, REC and Fbar with uncertainties
 # Note these values do not come from summary out, instead from SMS.std. Therefore values are slightly different
@@ -136,4 +148,10 @@ write.taf(retro_SSB, dir = "report")
 write.taf(retro_F,   dir = "report")
 write.taf(retro_REC, dir = "report")
 
-########################
+################
+## Internal Consistency
+dredge = read.csv(file.path('./data','survey.csv')) 
+colnames(dredge) <- c("Year","Age 0", "Age 1")
+write.taf(dredge,dir = "report")
+
+##############
