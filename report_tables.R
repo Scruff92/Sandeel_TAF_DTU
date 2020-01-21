@@ -155,3 +155,14 @@ colnames(dredge) <- c("Year","Age 0", "Age 1")
 write.taf(dredge,dir = "report")
 
 ##############
+
+
+
+##################################
+## Convert all to MD tables in new Directory
+# 
+dir.create("report/MD")
+files<-dir("./report")[grep(".csv",dir("./report"))]
+for(FILE in files){
+ taf2md(taf_file_in = FILE, dir_in= "report", dir_out="report/MD")
+}

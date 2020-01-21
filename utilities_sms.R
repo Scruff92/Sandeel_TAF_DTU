@@ -193,8 +193,27 @@ tmp<-subset(tmp,select=c(-prey,-predator))
 
 return(tmp)
 }
-##################
+
+#####################
+## Convert TAF csvs to mark down
+
+taf2md <- function(taf_file_in,dir_in="report",dir_out,md_file_out=NA){
+  
+  taf<-read.csv(paste0(dir_in,"/",taf_file_in),header = T)
+  md<-paste0('|', paste(names(taf), collapse = '|'), '|\n|', 
+         paste(rep('---', length(taf)), collapse = '|'), '|\n|', 
+         paste(Reduce(function(x, y){paste(x, y, sep = '|')}, taf), collapse = '|\n|'), '|')
+
+  if(is.na(md_file_out)){md_file_out <- paste0(substr(taf_file_in,start = 1,stop = nchar(taf_file_in)-3),"md")}
+
+  md_file_out<-paste0(dir_out,"/",md_file_out)
+  writeLines(md,md_file_out)
+}
+
+
+###########################################################
 ## Adapted from the Sandeel utilities
+#########################################################
 
 SMS2FLIndices_TAF<-function(control,fleet.inf="fleet_info.dat",fleet.index="fleet_catch.in",
                             fleet.name="fleet_names.in") {
