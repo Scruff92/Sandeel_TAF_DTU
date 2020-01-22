@@ -25,6 +25,7 @@ years <- read.sms.dat_TAF("first.year"):read.sms.dat_TAF("last.year")
 ## Catch at age
 taf.png("catage")
 catage <-read.csv("data/catage.csv")
+catage$X0[catage$Step==1] = 0
 catage <- aggregate(cbind(X0,X1,X2,X3,X4.)~Year,data = catage,sum)
 catprop<-as.data.frame(catage[,-1],row.names = catage$Year)
 catprop<-as.data.frame(prop.table(as.matrix(catprop),1))
