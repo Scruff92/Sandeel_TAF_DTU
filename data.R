@@ -38,8 +38,8 @@ effort <- data.frame(Year=effort.1$Year,
 
 ## Survey
 txt <- readLines("bootstrap/data/fleet_catch.in")
-dredge <- grep("# Dredge survey", txt)
-num <- grep("[0-9]", txt)
+dredge <- grep("# Dredge survey", txt,useBytes = T)
+num <- grep("[0-9]", txt,useBytes = T)
 skip <- min(num[num > dredge]) - 1
 survey <- read.table("bootstrap/data/fleet_catch.in",
                      skip=skip, comment.char="")
@@ -76,3 +76,4 @@ write.taf(maturity)  # 2.3
 write.taf(survey)    # 2.4
 write.taf(natmort)   # 2.8
 setwd("..")
+

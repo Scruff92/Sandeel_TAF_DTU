@@ -7,8 +7,9 @@ library(FLCore)
 
 # user options
 # first and last year for retro analysis of the most recent period
-f.year<-2013
-l.year<-2018  #cannot be larger than the last year with catches
+number_of_peels = 5
+l.year <- read.sms.dat_TAF("last.year")
+f.year <- l.year - number_of_peels
 
 fa<-read.sms.dat_TAF("first.age")
 
