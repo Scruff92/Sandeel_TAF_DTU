@@ -5,16 +5,15 @@
 ##         forecast_input.csv forecast_basis.csv, forecast_output.csv (output)
 
 
+source("utilities_sms.R")
 
+#user options
 #Arith log is either "Arithmetric" or "Log values". This is used for model output, uncertainities plots and table.
 Arith_log <- c("Arithmetric","Log values")[2]  #select assumed distribution of variables
 include.last.assessment.year.recruit<-T       # should be T when the dregde survey data are availeble
 
 
-
-library(icesTAF)
-source("utilities_sms.R")
-
+# Make Directory
 mkdir("output")
 
 ## Fishing mortalities

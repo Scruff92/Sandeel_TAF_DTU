@@ -10,12 +10,14 @@
 
 #NOTES: Why is Fbar diferent between summary out tables?
 
-library(icesTAF)
+if(!"ggplot2" %in% installed.packages()) {install.packages("ggplot2")}
 library(ggplot2)
+if(!"cowplot" %in% installed.packages()) {install.packages("cowplot")}
 suppressPackageStartupMessages(library(cowplot)) 
-options(bitmapType = "cairo")
 source("utilities_sms.R")
+options(bitmapType = "cairo")
 
+# Make Directory
 mkdir("report")
 
 #For use later in the script

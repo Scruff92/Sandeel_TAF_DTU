@@ -1,7 +1,11 @@
-# user options
-source("utilities_sms.R")
+###
+## Script to run Retrospecitve run of Sandeel Area-1r
+###
+
+if(!"FLCore" %in% installed.packages()){install.packages("FLCore", repos="http://flr-project.org/R")}
 library(FLCore)
 
+# user options
 # first and last year for retro analysis of the most recent period
 f.year<-2013
 l.year<-2018  #cannot be larger than the last year with catches

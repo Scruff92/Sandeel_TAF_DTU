@@ -3,10 +3,9 @@
 ## Before: data, software (bootstrap)
 ## After:  details.out, sms.rep, summary.table.out (model)
 
-library(icesTAF)
-library(FLCore)
 source("utilities_sms.R")
 
+# Make Directory
 mkdir("model")
 
 ## Get config

@@ -5,8 +5,10 @@
 ## After:  catage.csv, effort.csv, maturity.csv, natmort.csv, survey.csv,
 ##         wcatch.csv (data)
 
+if(!"icesTAF" %in% installed.packages()) {install.packages("icesTAF")}
 library(icesTAF)
 
+# Make Directory
 mkdir("data")
 
 ## Catch at age

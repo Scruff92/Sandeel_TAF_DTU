@@ -6,9 +6,9 @@
 ##         natmort.csv, summary.csv, survey.csv, wcatch.csv  forecast_input.csv (report)
 ##        
 
-library(icesTAF)
 source("utilities_sms.R")
 
+# Make Directory
 mkdir("report")
 
 ## 1  Data
