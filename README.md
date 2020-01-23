@@ -1,6 +1,6 @@
 # 2019_san.sa.1r
 
-2019 - Sandeel (Ammodytes spp.) in Divisions 4.b and 4.c, Sandeel Area 1r
+2019 - Sandeel (*Ammodytes* spp.) in Divisions 4.b and 4.c, Sandeel Area 1r
 (central and southern North Sea, Dogger Bank) - HAWG
 
 ## How to run
@@ -21,3 +21,35 @@ To view the results on the TAF server, browse the
 
 Once published, assessments results can also be browsed on the
 [ICES TAF website](https://taf.ices.dk/app/stock#!/2019/san.sa.1r)
+
+
+## Data input
+
+To run the sandeel TAF, the following **data** files must be supplied in the `bootstrap/intial/data` directory:
+
+ * canum.in
+ * effort.in
+ * fleet_catch.in
+ * natmor.in
+ * propmat.in
+ * proportion_m_and_f_before_spawning.in
+ * weca.in
+ * west.in
+ 
+ 
+ The following **config** files are also required in the ``bootstrap/intial/data/config` directory:
+ 
+ * fleet_info.dat
+ * fleet_names.in
+ * just_one.in
+ * recruitment_years.in
+ * reference_points.in
+ * sms.dat
+ * species_names.in
+ * zero_catch_season_ages.in
+ * zero_catch_year_season.in
+
+ 
+ **NB: Note that all filenames must be in lower case if ***Linux* **is used.**
+ 
+ 
