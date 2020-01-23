@@ -4,12 +4,12 @@
 # Input to forecast
 
 #defining if we use long term og 10 year average rec: 
-AA <- 34 #area 1r #this means using a long-term geom 
+AA <- read.sms.dat_TAF(label = "last.year")-1984 #area 1r #this means using a long-term geom 
+# this is the same as 34 in 2019, 35 in 2020 etc
 
 RANGE = 100 #top end of the Fmult range, which the optimize function should explore when calculating Fmsy
 
 TAC.year<-read.sms.dat_TAF(label = "last.year")+1
-
 
 #use this for area 1r
 scale.options<-c(0,1,1.1,1.2,1.3,1.4,1.5,1.6,1.7)*1
