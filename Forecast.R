@@ -3,6 +3,8 @@
 ########################
 # Input to forecast
 
+fcap=0.49
+
 #defining if we use long term og 10 year average rec: 
 AA <- read.sms.dat_TAF(label = "last.year")-1984 #area 1r #this means using a long-term geom 
 # this is the same as 34 in 2019, 35 in 2020 etc
@@ -11,10 +13,9 @@ RANGE = 100 #top end of the Fmult range, which the optimize function should expl
 
 TAC.year<-read.sms.dat_TAF(label = "last.year")+1
 
-fcap=0.49
 #use this for area 1r
-scale.options<-c(0,1,1.1,1.2,1.3,1.4,1.5,1.6,1.7)*1 # arbritrary scenarios
-# THE APPROPRIATE F-multipler to achieve Fcap is added below automatically
+scale.options<-c(0,0.5,1,1.5,2,2.5)*1 # arbritrary scenarios
+# THE APPROPRIATE F-multipler to achieve Fcap is calculated below automatically
 
 
 
@@ -184,13 +185,17 @@ WEST<-west.TAC
 
 SSB0<-sum(N.ini[,1]*WEST[,1]*PM.TAC/1000,na.rm=T) #97.59
 
-if (FALSE) {  # added by MV: to get a consistent (with output from the other tables) SSB in thebeginning of the TAC year
-  tmp<-subset(Read.SMS.std(),name=="next_log_SSB")
+if (TRUE) {  #to get a consistent (with output from the other tables) SSB in the beginning of the TAC year
+  tmp<-Read.SMS.std_TAF()
+  tmp <- tmp[tmp$name=="next_log_SSB",]
   SSB0.fromStdFile<-exp(tmp$value)
   #cat("SSB in (",TAC.year,") changed from calculated value based in input (N,west and propmat) to the forecast ",SSB0)
   SSB0<-SSB0.fromStdFile/1000
   #cat(" to ",SSB0, " from SSB calculated by SMS in the std file\n ")
-  tmp<-tail(subset(Read.SMS.std(),name=="log_recsd"),1)
+  #tmp<-tail(subset(Read.SMS.std(),name=="log_recsd"),1)
+  tmp <- Read.SMS.std_TAF()
+  tmp <- tmp[tmp$name=="log_recsd",]
+  tmp <- tail(tmp,1)
   Recruit.in.Assess.year<-exp(tmp$value)
 } 
 avg.F.ages<-read.sms.dat_TAF("avg.F.ages")
