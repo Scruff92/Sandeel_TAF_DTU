@@ -1361,7 +1361,6 @@ residplot_TAF<-function(residuals, xpos, ypos, maxsize = 0.25, poscol = 2, linec
   
   # 
   plot(xx, y, type = "n", xlab = xlab, ylab = ylab, axes = FALSE, main=main, las=1,ylim=c(min(y)-0.5,max(y)+0.5))
-  #plot(xx, y, type = "n",  axes = FALSE, main=main, las=1,ylim=c(min(y)-0.5,max(y)+0.5))
   
   axis(1)
   axis(2,min(ypos):max(ypos), tick=F,las=2)
@@ -1431,17 +1430,15 @@ residplot_TAF<-function(residuals, xpos, ypos, maxsize = 0.25, poscol = 2, linec
 
 
 
-plot.catch.residuals_TAF<-function(start.year=2000,end.year=2020,reverse.colors=F,add.title=TRUE,over.all.max=1.5) {
+plot.catch.residuals_TAF<-function(start.year=2000,end.year=2020,reverse.colors=F,add.title=TRUE,over.all.max=1.5,use.ref.dot=TRUE) {
   nox=1;noy=1
   
   taf.png("catch_residuals")
   
- use.ref.dot<-TRUE
-  
+
   standardize=F
   dev='screen'
   Portrait=T
-  use.ref.dot=TRUE
   add.title=F
   my.species=NA
   
@@ -1495,6 +1492,7 @@ plot.catch.residuals_TAF<-function(start.year=2000,end.year=2020,reverse.colors=
 ############
 
 plot.survey.residuals_TAF<-function(start.year=1980,end.year=2020,use.ref.dot=TRUE,add.title=TRUE,over.all.max=1.5,standardize=F) {
+
   nox=1;noy=1
   my.species=NA
   fleet.names<-read.fleet_TAF()

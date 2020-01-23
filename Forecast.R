@@ -11,8 +11,14 @@ RANGE = 100 #top end of the Fmult range, which the optimize function should expl
 
 TAC.year<-read.sms.dat_TAF(label = "last.year")+1
 
+fcap=0.49
 #use this for area 1r
-scale.options<-c(0,1,1.1,1.2,1.3,1.4,1.5,1.6,1.7)*1
+scale.options<-c(0,1,1.1,1.2,1.3,1.4,1.5,1.6,1.7)*1 # arbritrary scenarios
+# THE APPROPRIATE F-multipler to achieve Fcap is added below automatically
+
+
+
+
 
 roundTAC<-3   # number of decimals in TAC 
 
@@ -191,6 +197,9 @@ avg.F.ages<-read.sms.dat_TAF("avg.F.ages")
 avg.F.ages<-as.numeric(unlist(strsplit(avg.F.ages,""))[c(1,3)])
 mean.f<-sum(FF[(avg.F.ages[1]+1):(avg.F.ages[2]+1),]) /(avg.F.ages[2]-avg.F.ages[1]+1)
 
+fcapmult=fcap/mean.f
+
+scale.options<-c(scale.options,fcapmult)
 #
 BASIS=data.frame("Basis Reference" = NA,
                  "Basis Value" = NA)
@@ -233,7 +242,9 @@ if (Recruit.in.Assess.year>=0) {
   for (fmult in scale.options) {    
     SSB1<-do.prediction(fmult,RTM=Recruit.in.Assess.year,F.default=FF)/1000
     
-    if (fmult==scale.options[1]) string<-"F=0," else string<-paste('Fsq*',round(fmult,2),',',sep='')
+    if (fmult==scale.options[1]){ string<-"F=0,"} else{if(fmult==fcapmult){
+      string <-"Fcap,"}else string<-paste('Fsq*',round(fmult,2),',',sep='')}
+      
     if (fmult==scale.options[1]) cat(paste('F multiplier,Basis,F(',TAC.year,'),Catch(',TAC.year,'),SSB(',TAC.year+1,'),%SSB change*,%TAC change**\n',sep=''))
     cat(paste(round(fmult,2),',',string,round(mean.f*fmult,3),',',round(TAC,roundTAC),',',
               round(SSB1,3),',', round((SSB1-SSB0)/SSB0*100),'%,', round((TAC-Yield.assess)/Yield.assess*100),'%','\n'))
