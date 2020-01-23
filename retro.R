@@ -1,8 +1,6 @@
 ###
 ## Script to run Retrospecitve run of Sandeel Area-1r
 ###
-
-if(!"FLCore" %in% installed.packages()){install.packages("FLCore", repos="http://flr-project.org/R")}
 library(FLCore)
 
 # user options

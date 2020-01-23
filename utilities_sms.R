@@ -1,5 +1,11 @@
+if(!"iterators" %in% installed.packages()){install.packages("iterators")}
+if(!"FLCore" %in% installed.packages()){install.packages("FLCore", repos="http://flr-project.org/R")}
+library(FLCore)
+
+
 ## Read SMS output from details.out
 ## Labels: Stock numbers, Fishing mortality, etc.
+
 
 read.output <- function(file, label)
 {
