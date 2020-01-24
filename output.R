@@ -68,7 +68,7 @@ widths <- c(6, 15, 15, 15, 15, 15)
 summary <- read.fwf("model/summary_table.out", widths=widths, skip=4)
 names(summary) <- c("Year", "Rec", "SSB", "TSB", "Catch", "Fbar")
 summary <- summary[c("Year", "Rec", "TSB", "SSB", "Catch", "Fbar")]
-summary$Year[nrow(summary)] <- summary$Year[nrow(summary)-1] + 1  # current year
+summary$Year[nrow(summary)] <- summary$Year[nrow(summary)-1] + 1  # current ygear
 summary$Fbar <- c(fbar$Fbar, NA)  # precise F values
 
 ## Transcript
@@ -129,7 +129,7 @@ a$titl<- ifelse (a$variable %in% c('hist_SSB','hist_log_SSB'),"SSB", ifelse(a$va
 years<-sort(unique(a$Year))
 b<-matrix(NA,ncol=9,nrow=length(years))
 rownames(b)<-as.character(years)
-colnames(b)<-c('Recruitment','High','Low','SSB','High','Low','F ages 1-2','High','Low')
+colnames(b)<-c('Recruitment','High','Low','SSB','High','Low','F_ages_1-2','High','Low')
 aa<-aggregate(cbind(value,upper,lower)~Year+titl,data=a,sum)
 a2 <- as.matrix(aa[aa$titl=="Recruitment",c("value","upper","lower")],ncol=3)
 b[1:dim(a2)[[1]],1:3]<- a2

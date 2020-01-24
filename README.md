@@ -37,7 +37,7 @@ To run the sandeel TAF, the following **data** files must be supplied in the `bo
  * west.in
  
  
- The following **config** files are also required in the ``bootstrap/intial/data/config` directory:
+ The following **config** files are also required in the `bootstrap/intial/data/config` directory:
  
  * fleet_info.dat
  * fleet_names.in
@@ -50,6 +50,6 @@ To run the sandeel TAF, the following **data** files must be supplied in the `bo
  * zero_catch_year_season.in
 
  
- **NB: Note that all filenames must be in lower case if ***Linux* **is used.**
+ **NB: Note that all filenames must be in lower case if** *Linux* **is used.**
  
  

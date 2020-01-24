@@ -1,9 +1,15 @@
-#input and output of Forecast
+#input, basis and output of Forecast
 
 ########################
 # Input to forecast
 
 fcap=0.49
+previous_TAC=134.461 #in thousands of Tonnes
+
+############################################################################
+
+# Do not change the code below:
+
 
 #defining if we use long term og 10 year average rec: 
 AA <- read.sms.dat_TAF(label = "last.year")-1984 #area 1r #this means using a long-term geom 
@@ -13,8 +19,7 @@ RANGE = 100 #top end of the Fmult range, which the optimize function should expl
 
 TAC.year<-read.sms.dat_TAF(label = "last.year")+1
 
-#use this for area 1r
-scale.options<-c(0,0.5,1,1.5,2,2.5)*1 # arbritrary scenarios
+scale.options<-c(0,1) # Closed Fishery and F=status Quo
 # THE APPROPRIATE F-multipler to achieve Fcap is calculated below automatically
 
 
@@ -205,6 +210,9 @@ mean.f<-sum(FF[(avg.F.ages[1]+1):(avg.F.ages[2]+1),]) /(avg.F.ages[2]-avg.F.ages
 fcapmult=fcap/mean.f
 
 scale.options<-c(scale.options,fcapmult)
+
+
+Yield.assess = previous_TAC
 #
 BASIS=data.frame("Basis Reference" = NA,
                  "Basis Value" = NA)
@@ -249,7 +257,7 @@ if (Recruit.in.Assess.year>=0) {
     
     if (fmult==scale.options[1]){ string<-"F=0,"} else{if(fmult==fcapmult){
       string <-"Fcap,"}else string<-paste('Fsq*',round(fmult,2),',',sep='')}
-      
+    
     if (fmult==scale.options[1]) cat(paste('F multiplier,Basis,F(',TAC.year,'),Catch(',TAC.year,'),SSB(',TAC.year+1,'),%SSB change*,%TAC change**\n',sep=''))
     cat(paste(round(fmult,2),',',string,round(mean.f*fmult,3),',',round(TAC,roundTAC),',',
               round(SSB1,3),',', round((SSB1-SSB0)/SSB0*100),'%,', round((TAC-Yield.assess)/Yield.assess*100),'%','\n'))
