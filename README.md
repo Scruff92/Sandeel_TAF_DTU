@@ -14,6 +14,10 @@ taf.bootstrap()
 sourceAll()
 ```
 
+Note that there are two user-defined inputs at the beginning of the **Forecast.R** script:
+* fcap = the appropriate fcap value for this area
+* previous_TAC = The TAC reported in the previous years advice
+
 ## Explore results
 
 To view the results on the TAF server, browse the

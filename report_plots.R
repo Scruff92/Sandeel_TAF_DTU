@@ -26,16 +26,13 @@ years <- read.sms.dat_TAF("first.year"):read.sms.dat_TAF("last.year")
 ###############################
 ## Catch at age
 taf.png("catage")
-catage <-read.csv("data/catage.csv")
-catage$X0[catage$Step==1] = 0
-catage <- aggregate(cbind(X0,X1,X2,X3,X4.)~Year,data = catage,sum)
+catage <-read.taf("data/catage.csv")
+catage$`0`[catage$Step==1] = 0
+catage <- aggregate(cbind(`0`,`1`,`2`,`3`,`4+`)~Year,data = catage,sum)
 catprop<-as.data.frame(catage[,-1],row.names = catage$Year)
 catprop<-as.data.frame(prop.table(as.matrix(catprop),1))
-
-Ages<-c("0","1","2","3","4+")
-catprop<-as.data.frame(cbind(rownames(catprop),catprop),row.names = 1:nrow(catprop))
-colnames(catprop)<-c("Year",Ages)
-
+catprop<-xtab2taf(catprop)
+plus(catprop)
 catprop_long <- taf2long(catprop, names=c("Year","Age","Fmort"))
 
 # The years to be included on X-axis of figure (5 years between each)
@@ -75,7 +72,7 @@ dev.off()
 taf.png("all_effort")
 par(mar=c(5, 4, 4, 5)+0.1,xpd=TRUE)
 
-effort<-read.csv("./data/effort.csv",header=T)
+effort<-read.taf("./data/effort.csv",header=T)
 Seff<-effort$Total
 eff<-as.matrix(effort[,2:3])
 
